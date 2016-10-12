@@ -1,0 +1,47 @@
+﻿<template>
+    <!--<require from="bootstrap/css/bootstrap.css"></require>-->
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" onclick="$('.collapse').collapse('toggle');">
+                <span class="sr-only">Toggle Navigation</span>
+                <i class="fa fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="#">
+                <i class="fa fa-home"></i>
+                <span>${router.title}</span>
+            </a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar">
+            <ul class="nav navbar-nav">
+                <li repeat.for="row of router.navigation" class="${row.isActive ? 'active' : ''}">
+                    <a href.bind="row.href">${row.title}</a>
+                </li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li class="loader" if.bind="router.isNavigating">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="modal" id="genericModal" role="dialog">
+        <div class="modal-dialog" style="margin-top: 125px;">
+            <div id="genericModal_Content" class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"></h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button id="genericModal_Cancel" class="btn btn-primary" style="display: none;" onclick="$('#genericModal').modal('toggle');">Cancel</button>
+                    <button id="genericModal_OK" class="btn btn-primary" style="display: none;" onclick="$('#genericModal').modal('toggle');">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-host">
+        <router-view class="app-content"></router-view>
+    </div>
+</template>

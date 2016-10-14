@@ -1,7 +1,5 @@
 import {inject} from "aurelia-framework";
 import {Router, RouterConfiguration} from "aurelia-router";
-import $ from 'jquery';
-//import 'bootstrap';
 
 @inject(Router)
 export class App {

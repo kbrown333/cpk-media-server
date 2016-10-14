@@ -1,13 +1,21 @@
 <template>
+    <require from="../../elements/fa-toggle"></require>
+    <require from="../../attributes/toggle-me"></require>
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
-                        <h3 class="panel-title">Welcome to your dashboard!</h3>
+                        <div style="display: inline-block;">
+                            <h3 class="panel-title">Welcome to your dashboard!</h3>
+                        </div>
+                        <div style="display: inline-block; float: right;">
+                            <fa-toggle event="toggle_panel_1"></fa-toggle>
+                        </div>
                     </div>
-                    <div class="panel-body">
-                        
+                    <div class="panel-body" toggle-me.two-way="toggle_visibility.panel_body_1">
+                        <h4>Thank you for downloading the Cloudspire Aurelia Framework for Node JS!</h4>
+						<p>Please feel free to make a pull-request or send me a message, I hope you enjoy the simplicity and power of Aurelia!</p>
                     </div>
                 </div>
             </div>

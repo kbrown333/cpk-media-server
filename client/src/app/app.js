@@ -21,7 +21,6 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
                 aurelia_router_1 = aurelia_router_1_1;
             }],
         execute: function() {
-            //import 'bootstrap';
             App = class App {
                 constructor(router) {
                     this.router = router;

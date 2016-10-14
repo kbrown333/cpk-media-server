@@ -1,4 +1,4 @@
-System.register(['aurelia-framework', '../../models/utilities'], function(exports_1, context_1) {
+System.register(['aurelia-framework', '../models/utilities'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -11,7 +11,7 @@ System.register(['aurelia-framework', '../../models/utilities'], function(export
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
     var aurelia_framework_1, utilities_1;
-    var Dash;
+    var FaToggle;
     return {
         setters:[
             function (aurelia_framework_1_1) {
@@ -21,29 +21,41 @@ System.register(['aurelia-framework', '../../models/utilities'], function(export
                 utilities_1 = utilities_1_1;
             }],
         execute: function() {
-            Dash = class Dash {
+            FaToggle = class FaToggle {
                 constructor(utils) {
                     this.utils = utils;
-                    this.toggle_visibility = {
-                        panel_body_1: 'show'
-                    };
-                }
-                attached() {
-                    this.utils.addEventListener('toggle_panel_1', 'dash.ts', (state) => {
-                        if (state) {
-                            this.toggle_visibility.panel_body_1 = 'show';
+                    this.toggle = () => {
+                        if (this.state == 'on') {
+                            this.toggle_on = 'hide';
+                            this.toggle_off = 'show';
+                            this.state = 'off';
                         }
                         else {
-                            this.toggle_visibility.panel_body_1 = 'hide';
+                            this.toggle_on = 'show';
+                            this.toggle_off = 'hide';
+                            this.state = 'on';
                         }
-                    });
+                        if (this.event != null) {
+                            var status = this.state == 'on';
+                            this.utils.fireEvent(this.event, status);
+                        }
+                    };
+                    this.toggle_on = 'show';
+                    this.toggle_off = 'hide';
+                }
+                attached() {
+                    if (this.state != 'on') {
+                        this.toggle_on = 'hide';
+                    }
                 }
             };
-            Dash = __decorate([
+            FaToggle = __decorate([
+                aurelia_framework_1.bindable({ name: 'state', defaultValue: 'on' }),
+                aurelia_framework_1.bindable({ name: 'event', defaultValue: null }),
                 aurelia_framework_1.inject(utilities_1.Utilities), 
                 __metadata('design:paramtypes', [utilities_1.Utilities])
-            ], Dash);
-            exports_1("Dash", Dash);
+            ], FaToggle);
+            exports_1("FaToggle", FaToggle);
         }
     }
 });

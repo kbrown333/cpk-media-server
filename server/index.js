@@ -16,7 +16,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 //THIS SETS UP A STATIC RESOURCE FOLDER TO ACCESS PUBLIC FILES VIA HTTP
-app.use(express.static(path.join(__dirname, '../client/src')));
+// app.use(express.static(path.join(__dirname, '../client/src')));
+app.use(express.static(path.join('/home/csuser/Applications/cpk-media-server/client/src')));
 
 //Load Middleware Functions
 ////static pages
@@ -63,7 +64,7 @@ app.use(function(err, req, res, next) {
 var debug = require('debug')('WebAPI');
 
 //START SERVER
-app.set('port', process.env.PORT || 4000);
+app.set('port', process.env.PORT || 3000);
 var server = app.listen(app.get('port'), function() {
   debug('Express server listening on port ' + server.address().port);
 });

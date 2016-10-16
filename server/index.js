@@ -2,6 +2,7 @@ process.title = "cpk-media-server";
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
+var logger = require('morgan');
 
 //EXRPESS IS THE FRAMEWORK FOR CREATING SERVERS
 var app = express();
@@ -15,6 +16,7 @@ app.set('view engine', 'html');
 //THIS IS REGULAR CONFIGURATION STUFF
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(logger('dev'));
 
 //THIS SETS UP A STATIC RESOURCE FOLDER TO ACCESS PUBLIC FILES VIA HTTP
 app.use(express.static(path.join('../client/src')));

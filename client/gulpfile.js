@@ -33,7 +33,15 @@ var vendor_config = {
     }
 };
 
-gulp.task("default", ["bundle-vendor"], function () {
+//UN-COMMENT THIS TO BUILD JSPM PACKAGES INTO BUNDLE
+// gulp.task("default", ["bundle-vendor"], function () {
+//     return tsProject.src()
+//         .pipe(tsProject())
+//         .js.pipe(gulp.dest("src"));
+// });
+
+//COMMENT THIS OUT WHEN BUILDING JSPM PACKAGES
+gulp.task("default", function () {
     return tsProject.src()
         .pipe(tsProject())
         .js.pipe(gulp.dest("src"));

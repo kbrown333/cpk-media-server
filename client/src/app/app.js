@@ -29,7 +29,7 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
                 }
                 loadRouter() {
                     this.router.configure((config) => {
-                        config.title = "Aurelia";
+                        config.title = "CPK Media";
                         config.map([
                             { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dashboard' },
                         ]);

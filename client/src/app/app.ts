@@ -11,7 +11,7 @@ export class App {
 
     private loadRouter() {
         this.router.configure((config: RouterConfiguration): RouterConfiguration => {
-            config.title = "Aurelia";
+            config.title = "CPK Media";
             config.map([
                 { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dashboard' },
 

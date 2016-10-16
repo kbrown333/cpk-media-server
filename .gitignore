@@ -31,3 +31,6 @@ client/typings
 client/typings/*
 client/src/jspm_packages
 client/src/jspm_packages/*
+server/keys
+server/keys/*
+server/db_music.json

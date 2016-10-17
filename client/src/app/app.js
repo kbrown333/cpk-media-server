@@ -52,8 +52,11 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
                     this.router.configure((config) => {
                         config.title = "CPK Media";
                         config.map([
-                            { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dashboard' },
+                            { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dash' },
                             { route: ['files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
+                            { route: ['music'], name: 'music', moduleId: './views/music/music', nav: true, title: 'Music' },
+                            { route: ['pictures'], name: 'pictures', moduleId: './views/pictures/pictures', nav: true, title: 'Images' },
+                            { route: ['videos'], name: 'videos', moduleId: './views/videos/videos', nav: true, title: 'Videos' },
                         ]);
                         return config;
                     });

@@ -2,26 +2,36 @@
     <!--<require from="bootstrap/css/bootstrap.css"></require>-->
     <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" onclick="$('.collapse').collapse('toggle');">
-                <span class="sr-only">Toggle Navigation</span>
-                <i class="fa fa-bars"></i>
-            </button>
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#" click.delegate="toggle_aside()">
                 <i class="fa fa-list-ul"></i>
             </a>
+            <a class="navbar-brand" style="font-family: 'Comfortaa', cursive; margin-right: 15px;">
+                <span style="color: #cc0000;">CPK</span>
+                <span> Media</span>
+            </a>
+            <div class="show_on_mobile">
+                <a class="navbar-brand" href="#" style="float: right; margin-right: 15px;" click.delegate="toggle_header()">
+                    <i class="fa fa-bars"></i>
+                </a>
+                <a class="navbar-brand" href="#" style="float: right;">
+                    <i class="fa fa-search"></i>
+                </a>
+            </div>
         </div>
         <div class="collapse navbar-collapse" id="navbar">
             <ul class="nav navbar-nav">
-                <li repeat.for="row of router.navigation" class="${row.isActive ? 'active' : ''}">
+                <li repeat.for="row of router.navigation" class="${row.isActive ? 'active' : ''} router_link">
                     <a href.bind="row.href">${row.title}</a>
                 </li>
             </ul>
-
             <ul class="nav navbar-nav navbar-right">
                 <li class="loader" if.bind="router.isNavigating">
                     <i class="fa fa-spinner fa-spin fa-2x"></i>
                 </li>
             </ul>
+            <a class="navbar-brand show_on_monitor" href="#" style="float: right; margin-right: 15px;">
+                <i class="fa fa-search"></i>
+            </a>
         </div>
     </nav>
     <div class="modal" id="genericModal" role="dialog">

@@ -1,4 +1,8 @@
-﻿.dash_button {
+﻿.host_container {
+    margin-top: 50px;
+}
+
+.dash_button {
     height: auto; 
     width: 50%;
     margin-left: auto; 
@@ -14,4 +18,75 @@
 .dash_button, .dash_button > span {
     cursor: pointer;
     color: white;
+}
+
+li.active {
+    background-color: #2B2B2B !important;
+}
+
+.router_link {
+    background-color: #151515;
+    width: 110px;
+    text-align: center;
+}
+
+aside {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    width: 299px;
+    background-color: #1B1B1B;
+    z-index: 9999;
+    border: none;
+}
+
+.menu_row {
+    white-space: nowrap;
+    margin-bottom: 0px !important;
+}
+.aside_link {
+    cursor: pointer;
+    width: 300px;
+    padding: 14px 0px;
+    border-bottom: 1px solid white;
+}
+.aside_link:first-of-type {
+    border-top: 1px solid white;
+}
+.menu_value {
+    color: white;
+    text-align: center;
+}
+.hdn_info {
+    display: none;
+}
+.aside_link {
+    font: 14px/1.5 Ariel, Helvetica, sans-serif;
+}
+
+@media(min-width: 768px) {
+    .show_on_monitor {
+        display: block;
+    }
+    .show_on_mobile {
+        display: none;
+    }
+}
+@media(max-width: 767px) {
+    .show_on_mobile {
+        display: block;
+    }
+    .show_on_monitor {
+        display: none;
+    }
+    .date_controls {
+        float: left;
+        margin-bottom: 10px;
+    }
+    .theme_toggle_container {
+        height: 100%; 
+        position: absolute; 
+        right: 170px;
+    }
 }

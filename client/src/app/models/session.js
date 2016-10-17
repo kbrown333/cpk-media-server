@@ -8,6 +8,9 @@ System.register([], function(exports_1, context_1) {
             SessionData = class SessionData {
                 constructor() {
                     this.runtime = {};
+                    this.visibility = {
+                        aside: 'hide'
+                    };
                 }
             };
             exports_1("SessionData", SessionData);

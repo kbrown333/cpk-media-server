@@ -1,10 +1,12 @@
 <template>
     <require from="../../elements/fa-toggle"></require>
+    <require from="../../elements/aside"></require>
     <require from="../../attributes/toggle-me"></require>
-    <div class="container">
+    <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
+    <div class="container host_container">
         <div class="row">
             <div class="col-xs-12">
-                <div class="panel panel-primary">
+                <div class="panel panel-danger">
                     <div class="panel-heading">
                         <div style="display: inline-block;">
                             <h3 class="panel-title">Welcome to your dashboard!</h3>

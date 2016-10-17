@@ -1,4 +1,4 @@
-System.register(["aurelia-framework", "aurelia-router"], function(exports_1, context_1) {
+System.register(["aurelia-framework", "aurelia-router", './models/utilities', './models/session'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,7 +10,7 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var aurelia_framework_1, aurelia_router_1;
+    var aurelia_framework_1, aurelia_router_1, utilities_1, session_1;
     var App;
     return {
         setters:[
@@ -19,11 +19,32 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
             },
             function (aurelia_router_1_1) {
                 aurelia_router_1 = aurelia_router_1_1;
+            },
+            function (utilities_1_1) {
+                utilities_1 = utilities_1_1;
+            },
+            function (session_1_1) {
+                session_1 = session_1_1;
             }],
         execute: function() {
             App = class App {
-                constructor(router) {
+                //APPLICATION LOAD FUNCTIONS
+                constructor(router, utils, session) {
                     this.router = router;
+                    this.utils = utils;
+                    this.session = session;
+                    //APP EVENTS
+                    this.toggle_header = () => {
+                        $(".collapse").toggle();
+                    };
+                    this.toggle_aside = () => {
+                        if (this.session.visibility.aside == 'hide') {
+                            this.session.visibility.aside = 'show';
+                        }
+                        else {
+                            this.session.visibility.aside = 'hide';
+                        }
+                    };
                     this.loadRouter();
                     this.appLoaded();
                 }
@@ -32,6 +53,7 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
                         config.title = "CPK Media";
                         config.map([
                             { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dashboard' },
+                            { route: ['files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
                         ]);
                         return config;
                     });
@@ -40,8 +62,8 @@ System.register(["aurelia-framework", "aurelia-router"], function(exports_1, con
                 }
             };
             App = __decorate([
-                aurelia_framework_1.inject(aurelia_router_1.Router), 
-                __metadata('design:paramtypes', [aurelia_router_1.Router])
+                aurelia_framework_1.inject(aurelia_router_1.Router, utilities_1.Utilities, session_1.SessionData), 
+                __metadata('design:paramtypes', [aurelia_router_1.Router, utilities_1.Utilities, session_1.SessionData])
             ], App);
             exports_1("App", App);
         }

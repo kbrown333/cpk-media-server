@@ -1,0 +1,14 @@
+<template>
+	<div class="container" style="max-width: 300px;">
+		<div class="row menu_row" repeat.for="link of aside_links">
+			<div class="aside_link">
+				<div class='hdn_info'>
+					${link.event}
+				</div>
+				<div class="menu_value">
+					<span>${link.name}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

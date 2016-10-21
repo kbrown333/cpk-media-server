@@ -30,10 +30,6 @@ System.register(['aurelia-framework', '../models/session', '../models/utilities'
                     this.utils = utils;
                 }
                 attached() {
-                    $(".aside_link").click((event) => {
-                        var event_path = $(".hdn_info", event.currentTarget).text().trim();
-                        this.utils.fireEvent(event_path);
-                    });
                 }
             };
             Aside = __decorate([

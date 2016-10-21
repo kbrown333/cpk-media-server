@@ -28,7 +28,9 @@ export class App {
     }
 
     private appLoaded() {
-        
+        this.utils.addEventListener('toggle_aside', 'app.ts', () => {
+            this.toggle_aside();
+        });        
     }
 
     //APP EVENTS
@@ -38,10 +40,9 @@ export class App {
     }
 
     toggle_aside = () => {
-        if (this.session.visibility.aside == 'hide') {
-            this.session.visibility.aside = 'show';
-        } else {
-            this.session.visibility.aside = 'hide';
-        }
+        this.session.visibility.aside = 'stage';
+        setTimeout(() => {
+            this.session.visibility.aside = 'slide';
+        }, 10);
     }
 }

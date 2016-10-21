@@ -13,10 +13,7 @@ export class Aside {
 	}
 
 	attached() {
-		$(".aside_link").click((event: JQueryEventObject) => {
-			var event_path = $(".hdn_info", event.currentTarget).text().trim();
-			this.utils.fireEvent(event_path);
-		});
+		
 	}
 
 }

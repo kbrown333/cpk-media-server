@@ -6,11 +6,14 @@
     <link rel="stylesheet" href="app/styles/aurelia-default.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
+    <link href='app/javascript/jquery.ui-interactions/jquery-ui.min.css' rel='stylesheet' type='text/css'>
+    <link href='app/javascript/jquery.ui-interactions/jquery-ui.theme.min.css' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="app/styles/btsp-cyborg.css" />
     <link rel="stylesheet" href="app/styles/bootstrap-addon.css" />
     <link rel="stylesheet" href="app/styles/comfortaa.css" />
     <script type="text/javascript" src="app/javascript/jquery.js" />
 	<script type="text/javascript" src="app/javascript/bootstrap.min.js" />
+    <script type="text/javascript" src="./app/javascript/jquery-ui.min.js" />
     <style>
         body {
             background-image: url(./app/images/pattern_40.gif);
@@ -20,9 +23,10 @@
 <body>
     <script type="text/javascript" id="system_script"></script>
     <script type="text/javascript" id="config_script"></script>
+    <script type="text/javascript" id="jqui_script"></script>
     <div aurelia-app="main">
         <div class="splash">
-            <div class="message">Aurelia Scaffolding</div>
+            <div class="message">CPK Media Server</div>
             <i class="fa fa-spinner fa-spin fa-3x"></i>
         </div>
         <script>
@@ -33,6 +37,9 @@
                         $("#config_script").text(config);
                         SystemJS.import('aurelia-bootstrapper');
                     });
+                });
+                $.getScript('app/javascript/jquery-ui.min.js', function(ui) {
+                    $("#jqui_script").text(ui);
                 });
             });
         </script>

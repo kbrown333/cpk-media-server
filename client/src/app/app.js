@@ -38,12 +38,10 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
                         $(".collapse").toggle();
                     };
                     this.toggle_aside = () => {
-                        if (this.session.visibility.aside == 'hide') {
-                            this.session.visibility.aside = 'show';
-                        }
-                        else {
-                            this.session.visibility.aside = 'hide';
-                        }
+                        this.session.visibility.aside = 'stage';
+                        setTimeout(() => {
+                            this.session.visibility.aside = 'slide';
+                        }, 10);
                     };
                     this.loadRouter();
                     this.appLoaded();
@@ -62,6 +60,9 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
                     });
                 }
                 appLoaded() {
+                    this.utils.addEventListener('toggle_aside', 'app.ts', () => {
+                        this.toggle_aside();
+                    });
                 }
             };
             App = __decorate([

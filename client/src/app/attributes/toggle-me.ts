@@ -19,6 +19,11 @@ export class ToggleMeCustomAttribute {
             $(this.element).remove();
         } else if (state == "show") {
             $(this.element).show();
+        } else if (state == "slide") {
+            $(this.element).toggle('slide');
+        } else if (state == "stage") {
+            //this is intentionally blank to allow 
+            //slide to work bi-directionally
         } else {
             $(this.element).css('display', 'inline-block');
         }

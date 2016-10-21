@@ -1,4 +1,13 @@
+import {inject} from 'aurelia-framework';
+import {Ajax} from './ajax';
+
+@inject(Ajax)
 export class Utilities {
+    
+    constructor(public ajax: Ajax) {
+        this.handleResize();
+    }
+
     // sequencing functions
     public afterSeries(times: number, func: Function): Function {
         return () => {
@@ -44,5 +53,18 @@ export class Utilities {
     }
     public fireException(data: any): void {
         this.fireEvent("exception", data);
+    }
+    private handleResize(): void {
+        var resizeTimeout;
+        $(window).resize(() => {
+            if (!!resizeTimeout) { resizeTimeout = null; }
+            resizeTimeout = setTimeout(() => {
+                var data = {
+                    height: $(window).height(),
+                    width: $(window).width()
+                };
+                this.fireEvent('screen_resize', data);
+            }, 100);
+        });
     }
 }

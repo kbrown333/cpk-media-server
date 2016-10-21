@@ -36,6 +36,11 @@ System.register(['aurelia-framework'], function(exports_1, context_1) {
                     else if (state == "show") {
                         $(this.element).show();
                     }
+                    else if (state == "slide") {
+                        $(this.element).toggle('slide');
+                    }
+                    else if (state == "stage") {
+                    }
                     else {
                         $(this.element).css('display', 'inline-block');
                     }

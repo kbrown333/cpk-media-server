@@ -1,5 +1,6 @@
 ﻿.host_container {
-    margin-top: 50px;
+    margin-top: 30px;
+    width: 95%;
 }
 
 .dash_button {
@@ -66,6 +67,36 @@ aside {
     font: 14px/1.5 Ariel, Helvetica, sans-serif;
 }
 
+/*Files Page*/
+.icon-row {
+    width: 80%; 
+    margin: 0 auto; 
+    clear: both; 
+    text-align: center;
+    color: white;
+    padding-top: 15px;
+}
+.icon-row > span {
+    word-wrap: break-word;
+}
+.icon-block {
+    height: 125px;
+    overflow: hidden;
+}
+.fa-folder {
+    color: #388989;
+}
+.fa-file {
+    color: white;
+}
+.selected_block {
+    background-color: blue;
+}
+
+.panel-body {
+    overflow: auto;
+}
+
 @media(min-width: 768px) {
     .show_on_monitor {
         display: block;
@@ -89,5 +120,21 @@ aside {
         height: 100%; 
         position: absolute; 
         right: 170px;
+    }
+    .router_link {
+        width: 100%;
+    }
+    .icon-block {
+        max-width: 175px;
+        margin: auto;
+    }
+}
+@media(max-width: 450px) {
+    #lbl_page_container, #icon_list_container {
+        width: 100%;
+        text-align: center;
+    }
+    .icon_container {
+        height: 125px;
     }
 }

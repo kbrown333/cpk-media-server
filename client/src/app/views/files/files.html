@@ -1,3 +1,57 @@
 <template>
-	
+    <require from="../../elements/aside"></require>
+    <require from="../../attributes/toggle-me"></require>
+    <require from="../../attributes/dbl-click"></require>
+    <require from="../../attributes/one-click"></require>
+    <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
+	<div class="container host_container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="panel panel-danger">
+                    <div class="panel-heading">
+                    	<div style="display: inline-block; margin-right: 7px;">
+                    		<i class="fa fa-table"></i>
+                    	</div>
+                        <div style="display: inline-block;">
+                            <h3 class="panel-title">${display_path}</h3>
+                        </div>
+                        <div style="display: inline-block; float: right;">
+                            <fa-toggle event="toggle_panel_1"></fa-toggle>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div class="row">
+							<div repeat.for="folder of visible_folders">
+								<div class="col-lg-2 col-md-3 col-sm-4">
+									<div class="icon-block drag_me drop_here" block-type="folder">
+										<div class="icon-row">
+											<i class="fa fa-folder fa-3x" 
+												dbl-click="event.bind: 'open_folder'; data.bind: folder;"
+												one-click="event.bind: 'select_folder'; data.bind: $index;"></i>
+										</div>
+										<div class="icon-row">
+											<span>${folder}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div repeat.for="file of visible_files">
+								<div class="col-lg-2 col-md-3 col-sm-4" icon-file="${file}">
+									<div class="icon-block drag_me" block-type="file">
+										<div class="icon-row">
+											<i class="fa fa-file-o fa-3x"
+												one-click="event.bind: 'select_file'; data.bind: $index;"></i>
+										</div>
+										<div class="icon-row">
+											<span>${file}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </template>

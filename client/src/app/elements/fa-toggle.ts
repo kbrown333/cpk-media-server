@@ -1,9 +1,9 @@
 import {inject, bindable, bindingMode} from 'aurelia-framework';
-import {Utilities} from '../models/utilities';
+import {FnTs} from '../models/FnTs';
 
 @bindable({ name: 'state', defaultValue: 'on' })
 @bindable({ name: 'event', defaultValue: null })
-@inject(Utilities)
+@inject(FnTs)
 export class FaToggle {
 
     state: string;
@@ -11,7 +11,7 @@ export class FaToggle {
     toggle_on: string;
     toggle_off: string;
 
-    constructor(private utils: Utilities) {
+    constructor(private fn: FnTs) {
         this.toggle_on = 'show';
         this.toggle_off = 'hide';
     }
@@ -34,7 +34,7 @@ export class FaToggle {
         }
         if (this.event != null) {
             var status = this.state == 'on';
-            this.utils.fireEvent(this.event, status);
+            this.fn.ea.publish('react', { event_name: this.event, data: status });
         }
     }
 }

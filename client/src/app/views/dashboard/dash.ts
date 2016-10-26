@@ -1,36 +1,39 @@
 import {inject, bindable} from 'aurelia-framework';
-import {Utilities} from '../../models/utilities';
-import {SessionData} from '../../models/session';
+import {FnTs} from '../../models/FnTs';
 
-@inject(Utilities, SessionData)
+@inject(FnTs)
 export class Dash {
 
-    toggle_visibility: any;
+    app_events: any;
+    toggle_visibility: any = {
+        dash_panel: 'show'
+    }
     aside_links: any = [
-        {name: 'Test Link', event: 'test_link'}
+        {name: 'Test Link', event: 'testLink', data: 'Test Link.'}
     ];
 
-    constructor(private utils: Utilities, private session: SessionData) {
-        this.toggle_visibility = {
-            panel_body_1: 'show'
+    constructor(private fn: FnTs) {  }
+
+    attached(): void {
+        this.app_events = this.fn.ea.subscribe('react', (event: any) => {
+            if (this[event.event_name] != null) { this[event.event_name](event.data); }
+        });
+    }
+
+    detached() {
+        this.app_events.dispose();
+    }
+
+    //event-aggregator handlers
+    toggleDashPanel(state: boolean): void {
+        if (state) {
+            this.toggle_visibility.dash_panel = 'show';
+        } else {
+            this.toggle_visibility.dash_panel = 'hide';
         }
     }
 
-    attached(): void {
-        this.utils.addEventListener('toggle_panel_1', 'dash.ts', (state: boolean) => {
-            if (state) {
-                this.toggle_visibility.panel_body_1 = 'show';
-            } else {
-                this.toggle_visibility.panel_body_1 = 'hide';
-            }
-        });
-        this.utils.addEventListener('test_link', 'dash.ts', () => {
-            alert('Testing Link');
-        });
-    }
-
-    detached(): void {
-        this.utils.dropEventListener('toggle_panel_1', 'dash.ts');
-        this.utils.dropEventListener('test_link', 'dash.ts');
+    testLink(msg: string) {
+        alert(msg);
     }
 }

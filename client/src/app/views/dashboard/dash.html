@@ -1,9 +1,9 @@
 <template>
     <require from="../../elements/fa-toggle"></require>
-    <require from="../../elements/aside"></require>
     <require from="../../attributes/toggle-me"></require>
+    <require from="../../elements/aside"></require>
     <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
-    <div class="container host_container">
+    <div class="container host_container" style="width: 90%;">
         <div class="row">
             <div class="col-xs-12">
                 <div class="panel panel-danger">
@@ -12,10 +12,10 @@
                             <h3 class="panel-title">Welcome to your dashboard!</h3>
                         </div>
                         <div style="display: inline-block; float: right;">
-                            <fa-toggle event="toggle_panel_1"></fa-toggle>
+                            <fa-toggle event="toggleDashPanel"></fa-toggle>
                         </div>
                     </div>
-                    <div class="panel-body" toggle-me.two-way="toggle_visibility.panel_body_1">
+                    <div class="panel-body" toggle-me.two-way="toggle_visibility.dash_panel">
                         <h4>Thank you for downloading the Cloudspire Aurelia Framework for Node JS!</h4>
 						<p>Please feel free to make a pull-request or send me a message, I hope you enjoy the simplicity and power of Aurelia!</p>
                     </div>

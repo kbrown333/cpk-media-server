@@ -1,17 +1,17 @@
 ﻿.host_container {
-    margin-top: 30px;
-    width: 95%;
+    margin-top: 20px;
+    width: 98%;
 }
 
 .dash_button {
-    height: auto; 
+    height: auto;
     width: 50%;
-    margin-left: auto; 
-    margin-right: auto; 
+    margin-left: auto;
+    margin-right: auto;
     margin-top: 15px;
     margin-bottom: 15px;
-    min-height: 100px; 
-    border: 1px solid transparent; 
+    min-height: 100px;
+    border: 1px solid transparent;
     text-align: center;
     background-color: #2a9fd6;
 }
@@ -69,9 +69,9 @@ aside {
 
 /*Files Page*/
 .icon-row {
-    width: 80%; 
-    margin: 0 auto; 
-    clear: both; 
+    width: 80%;
+    margin: 0 auto;
+    clear: both;
     text-align: center;
     color: white;
     padding-top: 15px;
@@ -82,6 +82,7 @@ aside {
 .icon-block {
     height: 125px;
     overflow: hidden;
+    margin: 5px 0px;
 }
 .fa-folder {
     color: #388989;
@@ -92,9 +93,41 @@ aside {
 .selected_block {
     background-color: blue;
 }
-
+.panel-heading {
+    font-size: 18px;
+}
 .panel-body {
     overflow: auto;
+}
+i.panel-hdr-btn {
+    padding: 3px 5px;
+    margin-left: 7px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    cursor: pointer;
+}
+i.upload_btn {
+    background-color: #FF8800;
+    color: white;
+}
+i.new_folder_btn {
+    background-color: #77B300;
+    color: white;
+}
+i.edit_btn {
+    background-color: #BBA223;
+    color: white;
+}
+i.download_btn {
+    background-color: #7A29A3;
+    color: white;
+}
+i.delete_btn {
+    background-color: #880C0C;
+    color: white;
+}
+.hidden_input {
+    display: none;
 }
 
 @media(min-width: 768px) {
@@ -117,8 +150,8 @@ aside {
         margin-bottom: 10px;
     }
     .theme_toggle_container {
-        height: 100%; 
-        position: absolute; 
+        height: 100%;
+        position: absolute;
         right: 170px;
     }
     .router_link {

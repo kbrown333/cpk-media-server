@@ -1,15 +1,17 @@
 import {inject} from "aurelia-framework";
 import {Router, RouterConfiguration} from "aurelia-router";
-import {Utilities} from './models/utilities';
 import {SessionData} from './models/session';
+import {FnTs} from './models/FnTs';
 
-@inject(Router, Utilities, SessionData)
+@inject(Router, SessionData, FnTs)
 export class App {
 
-    //APPLICATION LOAD FUNCTIONS
+    app_events: any;
 
-    constructor(private router: Router, private utils: Utilities, private session: SessionData) {
+    //APPLICATION LOAD FUNCTIONS
+    constructor(private router: Router, private session: SessionData, private fn: FnTs) {
         this.loadRouter();
+        this.loadEventListener();
         this.appLoaded();
     }
 
@@ -27,10 +29,14 @@ export class App {
         });
     }
 
+    loadEventListener() {
+		this.app_events = this.fn.ea.subscribe('react', (event: any) => {
+            if (this[event.event_name] != null) { this[event.event_name](event.data); }
+        });
+    }
+
     private appLoaded() {
-        this.utils.addEventListener('toggle_aside', 'app.ts', () => {
-            this.toggle_aside();
-        });        
+        this.handleResize();
     }
 
     //APP EVENTS
@@ -44,5 +50,19 @@ export class App {
         setTimeout(() => {
             this.session.visibility.aside = 'slide';
         }, 10);
+    }
+
+    private handleResize(): void {
+        var resizeTimeout;
+        $(window).resize(() => {
+            if (!!resizeTimeout) { resizeTimeout = null; }
+            resizeTimeout = setTimeout(() => {
+                var data = {
+                    height: $(window).height(),
+                    width: $(window).width()
+                };
+                this.fn.ea.publish('react', {event_name: 'screenResize', data: data});
+            }, 100);
+        });
     }
 }

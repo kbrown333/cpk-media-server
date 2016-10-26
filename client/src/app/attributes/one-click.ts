@@ -1,15 +1,15 @@
 import {bindable, bindingMode, inject} from 'aurelia-framework';
-import {Utilities} from '../models/utilities';
+import {FnTs} from '../models/FnTs';
 
-@inject(Element, Utilities)
+@inject(Element, FnTs)
 export class OneClickCustomAttribute {
 
     @bindable event: string;
     @bindable data: any;
 
-    constructor(private element: Element, private utils: Utilities) {
+    constructor(private element: Element, private fn: FnTs) {
         $(element).click((event: JQueryEventObject) => {
-            this.utils.fireEvent(this.event, this.data);
+            this.fn.ea.publish('react', {event_name: this.event, data: this.data });
         });
     }
 

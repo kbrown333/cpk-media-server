@@ -1,6 +1,5 @@
-System.register(["aurelia-framework", "aurelia-router", './models/utilities', './models/session'], function(exports_1, context_1) {
+System.register(["aurelia-framework", "aurelia-router", "./models/session", "./models/FnTs"], function (exports_1, context_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -10,30 +9,29 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var aurelia_framework_1, aurelia_router_1, utilities_1, session_1;
-    var App;
+    var __moduleName = context_1 && context_1.id;
+    var aurelia_framework_1, aurelia_router_1, session_1, FnTs_1, App;
     return {
-        setters:[
+        setters: [
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
             function (aurelia_router_1_1) {
                 aurelia_router_1 = aurelia_router_1_1;
             },
-            function (utilities_1_1) {
-                utilities_1 = utilities_1_1;
-            },
             function (session_1_1) {
                 session_1 = session_1_1;
-            }],
-        execute: function() {
+            },
+            function (FnTs_1_1) {
+                FnTs_1 = FnTs_1_1;
+            }
+        ],
+        execute: function () {
             App = class App {
-                //APPLICATION LOAD FUNCTIONS
-                constructor(router, utils, session) {
+                constructor(router, session, fn) {
                     this.router = router;
-                    this.utils = utils;
                     this.session = session;
-                    //APP EVENTS
+                    this.fn = fn;
                     this.toggle_header = () => {
                         $(".collapse").toggle();
                     };
@@ -44,6 +42,7 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
                         }, 10);
                     };
                     this.loadRouter();
+                    this.loadEventListener();
                     this.appLoaded();
                 }
                 loadRouter() {
@@ -59,17 +58,37 @@ System.register(["aurelia-framework", "aurelia-router", './models/utilities', '.
                         return config;
                     });
                 }
+                loadEventListener() {
+                    this.app_events = this.fn.ea.subscribe('react', (event) => {
+                        if (this[event.event_name] != null) {
+                            this[event.event_name](event.data);
+                        }
+                    });
+                }
                 appLoaded() {
-                    this.utils.addEventListener('toggle_aside', 'app.ts', () => {
-                        this.toggle_aside();
+                    this.handleResize();
+                }
+                handleResize() {
+                    var resizeTimeout;
+                    $(window).resize(() => {
+                        if (!!resizeTimeout) {
+                            resizeTimeout = null;
+                        }
+                        resizeTimeout = setTimeout(() => {
+                            var data = {
+                                height: $(window).height(),
+                                width: $(window).width()
+                            };
+                            this.fn.ea.publish('react', { event_name: 'screenResize', data: data });
+                        }, 100);
                     });
                 }
             };
             App = __decorate([
-                aurelia_framework_1.inject(aurelia_router_1.Router, utilities_1.Utilities, session_1.SessionData), 
-                __metadata('design:paramtypes', [aurelia_router_1.Router, utilities_1.Utilities, session_1.SessionData])
+                aurelia_framework_1.inject(aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs),
+                __metadata("design:paramtypes", [aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs])
             ], App);
             exports_1("App", App);
         }
-    }
+    };
 });

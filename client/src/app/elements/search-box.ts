@@ -1,20 +1,23 @@
 import {inject, bindable, bindingMode} from 'aurelia-framework';
-import {Utilities} from '../models/utilities';
+import {FnTs} from '../models/FnTs';
 
 @bindable({name: 'event', defaultValue: null})
-@inject(Utilities)
+@inject(FnTs)
 export class SearchBox {
-	
+
 	event: string;
 	search_key: string;
 
-	constructor(private utils: Utilities) {
+	constructor(private fn: FnTs) {
 
 	}
 
 	search = () => {
 		if (this.event != null) {
-			this.utils.fireEvent(this.event, this.search_key);
+			this.fn.ea.publish('react', {
+				event_name: this.event,
+				data: this.search_key
+			});
 		}
 	}
 

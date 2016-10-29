@@ -1,5 +1,6 @@
-System.register(["aurelia-framework", "../models/session"], function (exports_1, context_1) {
+System.register(['aurelia-framework', '../models/session'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,18 +10,17 @@ System.register(["aurelia-framework", "../models/session"], function (exports_1,
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var __moduleName = context_1 && context_1.id;
-    var aurelia_framework_1, session_1, Aside;
+    var aurelia_framework_1, session_1;
+    var Aside;
     return {
-        setters: [
+        setters:[
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
             function (session_1_1) {
                 session_1 = session_1_1;
-            }
-        ],
-        execute: function () {
+            }],
+        execute: function() {
             Aside = class Aside {
                 constructor(session) {
                     this.session = session;
@@ -30,10 +30,10 @@ System.register(["aurelia-framework", "../models/session"], function (exports_1,
             };
             Aside = __decorate([
                 aurelia_framework_1.bindable({ name: 'aside_links', defaultBindingMode: aurelia_framework_1.bindingMode.twoWay, defaultValue: {} }),
-                aurelia_framework_1.inject(session_1.SessionData),
-                __metadata("design:paramtypes", [session_1.SessionData])
+                aurelia_framework_1.inject(session_1.SessionData), 
+                __metadata('design:paramtypes', [session_1.SessionData])
             ], Aside);
             exports_1("Aside", Aside);
         }
-    };
+    }
 });

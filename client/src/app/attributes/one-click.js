@@ -1,5 +1,6 @@
-System.register(["aurelia-framework", "../models/FnTs"], function (exports_1, context_1) {
+System.register(['aurelia-framework', '../models/FnTs'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,18 +10,17 @@ System.register(["aurelia-framework", "../models/FnTs"], function (exports_1, co
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var __moduleName = context_1 && context_1.id;
-    var aurelia_framework_1, FnTs_1, OneClickCustomAttribute;
+    var aurelia_framework_1, FnTs_1;
+    var OneClickCustomAttribute;
     return {
-        setters: [
+        setters:[
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
             function (FnTs_1_1) {
                 FnTs_1 = FnTs_1_1;
-            }
-        ],
-        execute: function () {
+            }],
+        execute: function() {
             OneClickCustomAttribute = class OneClickCustomAttribute {
                 constructor(element, fn) {
                     this.element = element;
@@ -37,18 +37,18 @@ System.register(["aurelia-framework", "../models/FnTs"], function (exports_1, co
                 }
             };
             __decorate([
-                aurelia_framework_1.bindable,
-                __metadata("design:type", String)
+                aurelia_framework_1.bindable, 
+                __metadata('design:type', String)
             ], OneClickCustomAttribute.prototype, "event", void 0);
             __decorate([
-                aurelia_framework_1.bindable,
-                __metadata("design:type", Object)
+                aurelia_framework_1.bindable, 
+                __metadata('design:type', Object)
             ], OneClickCustomAttribute.prototype, "data", void 0);
             OneClickCustomAttribute = __decorate([
-                aurelia_framework_1.inject(Element, FnTs_1.FnTs),
-                __metadata("design:paramtypes", [Element, FnTs_1.FnTs])
+                aurelia_framework_1.inject(Element, FnTs_1.FnTs), 
+                __metadata('design:paramtypes', [Element, FnTs_1.FnTs])
             ], OneClickCustomAttribute);
             exports_1("OneClickCustomAttribute", OneClickCustomAttribute);
         }
-    };
+    }
 });

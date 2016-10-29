@@ -1,4 +1,4 @@
-System.register(['aurelia-framework', '../models/utilities'], function(exports_1, context_1) {
+System.register(['aurelia-framework', '../models/FnTs'], function(exports_1, context_1) {
     "use strict";
     var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
@@ -10,31 +10,34 @@ System.register(['aurelia-framework', '../models/utilities'], function(exports_1
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var aurelia_framework_1, utilities_1;
+    var aurelia_framework_1, FnTs_1;
     var SearchBox;
     return {
         setters:[
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
-            function (utilities_1_1) {
-                utilities_1 = utilities_1_1;
+            function (FnTs_1_1) {
+                FnTs_1 = FnTs_1_1;
             }],
         execute: function() {
             SearchBox = class SearchBox {
-                constructor(utils) {
-                    this.utils = utils;
+                constructor(fn) {
+                    this.fn = fn;
                     this.search = () => {
                         if (this.event != null) {
-                            this.utils.fireEvent(this.event, this.search_key);
+                            this.fn.ea.publish('react', {
+                                event_name: this.event,
+                                data: this.search_key
+                            });
                         }
                     };
                 }
             };
             SearchBox = __decorate([
                 aurelia_framework_1.bindable({ name: 'event', defaultValue: null }),
-                aurelia_framework_1.inject(utilities_1.Utilities), 
-                __metadata('design:paramtypes', [utilities_1.Utilities])
+                aurelia_framework_1.inject(FnTs_1.FnTs), 
+                __metadata('design:paramtypes', [FnTs_1.FnTs])
             ], SearchBox);
             exports_1("SearchBox", SearchBox);
         }

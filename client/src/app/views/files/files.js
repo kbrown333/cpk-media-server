@@ -1,5 +1,6 @@
-System.register(["aurelia-framework", "../../models/utilities", "../../models/FnTs"], function (exports_1, context_1) {
+System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, context_1) {
     "use strict";
+    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -9,28 +10,22 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var __moduleName = context_1 && context_1.id;
-    var aurelia_framework_1, utilities_1, FnTs_1, Files;
+    var aurelia_framework_1, FnTs_1;
+    var Files;
     return {
-        setters: [
+        setters:[
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
-            function (utilities_1_1) {
-                utilities_1 = utilities_1_1;
-            },
             function (FnTs_1_1) {
                 FnTs_1 = FnTs_1_1;
-            }
-        ],
-        execute: function () {
+            }],
+        execute: function() {
             Files = class Files {
-                constructor(utils, fn) {
-                    this.utils = utils;
+                constructor(fn) {
                     this.fn = fn;
                     this.directory = {};
-                    this.current_path = '/music';
-                    this.display_path = 'Music';
+                    this.current_path = '';
                     this.selected_objects = [];
                     this.cntl_enabled = false;
                     this.aside_links = [
@@ -47,55 +42,64 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                         show_loader: 'show',
                         show_files: 'hide'
                     };
-                    this.load_files = (data) => {
-                        this.files = data.files;
-                        var directory = {};
-                        var str_i, str_j, tmp, dir, fname;
-                        for (var i = 0; i < data.files.length; i++) {
-                            str_i = data.files[i];
-                            tmp = str_i.split('/');
-                            if (tmp.length > 0) {
-                                dir = directory;
-                                for (var j = 0; j < tmp.length - 1; j++) {
-                                    str_j = tmp[j];
-                                    if (dir[str_j] == null) {
-                                        if (j > 0) {
-                                            dir[str_j] = { '...': {} };
-                                        }
-                                        else {
-                                            dir[str_j] = {};
-                                        }
-                                    }
-                                    dir = dir[str_j];
-                                }
-                                fname = tmp[tmp.length - 1];
-                                if (dir['_files_'] == null) {
-                                    dir['_files_'] = [];
-                                }
-                                if (fname != "") {
-                                    dir['_files_'].push(fname);
-                                }
-                            }
-                        }
-                        this.directory = directory;
+                    this.reduce_path = (a, b) => { return a + '/' + b; };
+                    this.startRender = (data) => {
+                        this.BuildFolderStructure(data)
+                            .then(this.getDirectory)
+                            .then(this.buildDirectory)
+                            .then(this.renderDirectory)
+                            .catch(this.fn.logError);
                     };
-                    this.upload = (formData) => {
-                        this.post_files(formData);
+                    this.renderDirectory = (data) => {
+                        this.current_path = data.current_path;
+                        this.directory = data.directory;
+                        this.visible_files = data.visible_files;
+                        this.visible_folders = data.visible_folders;
+                        if (data.files != null) {
+                            this.files = data.files;
+                        }
+                        setTimeout(() => {
+                            this.register_drag_drop();
+                            this.show_files();
+                        }, 500);
+                    };
+                    this.BuildFolderStructure = (data) => {
+                        return new Promise((res, err) => {
+                            var dir = {};
+                            for (var i = 0; i < data.files.length; i++) {
+                                this.create_file_path(data.files[i], dir);
+                            }
+                            res({
+                                files: data.files,
+                                directory: dir,
+                                current_path: this.current_path
+                            });
+                        });
+                    };
+                    this.getDirectory = (data) => {
+                        var dir = data.directory;
+                        var tmp = data.current_path.split('/');
+                        var path;
+                        for (var i = 1; i < tmp.length; i++) {
+                            path = tmp[i];
+                            dir = dir[path];
+                        }
+                        data.current_directory = dir;
+                        return data;
+                    };
+                    this.click_upload_btn = () => {
+                        $('#upload-input').click();
                     };
                     this.delete_files = () => {
                         this.show_loader();
-                        this.utils.ajax.post({
-                            path: '/files/delete_files',
-                            data: {
-                                files: this.selected_objects,
-                                path: this.current_path
-                            },
-                            callback: (data) => {
-                                this.get_files();
-                            },
-                            error: (data) => {
-                                console.error(data.responseText);
-                            }
+                        var data = {
+                            url: 'files/delete_files',
+                            type: 'POST',
+                            data: { files: this.selected_objects, path: this.current_path }
+                        };
+                        this.fn.fn_Ajax(data)
+                            .then(() => {
+                            this.getFiles();
                         });
                     };
                     this.download_file = () => {
@@ -107,16 +111,7 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                         var file = rt + items[0];
                         window.open('/files/download_files?file=' + file);
                     };
-                    this.edit_file = () => {
-                        var x = 1;
-                    };
-                    this.add_folder = () => {
-                        var x = 1;
-                    };
-                    this.upload_file = () => {
-                        $('#upload-input').click();
-                    };
-                    this.get_files();
+                    this.getFiles();
                 }
                 attached() {
                     this.app_events = this.fn.ea.subscribe('react', (event) => {
@@ -135,41 +130,49 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                             this.cntl_enabled = false;
                         }
                     });
+                    $("#upload-input").on('change', () => {
+                        this.upload_files_selected();
+                    });
                 }
                 detached() {
                     this.app_events.dispose();
                 }
-                set_title(data) {
-                    switch (data) {
-                        case 'music':
-                            this.display_path = 'Music';
-                            break;
-                        case 'documents':
-                            this.display_path = 'Documents';
-                            break;
-                        case 'pictures':
-                            this.display_path = 'Pictures';
-                            break;
-                        case 'videos':
-                            this.display_path = 'Videos';
-                            break;
+                getFiles() {
+                    this.fn.fn_Ajax({ url: '/files/files_list' })
+                        .then(this.startRender);
+                }
+                create_file_path(path, current_dir) {
+                    var parts = path.split('/').filter((val) => { return val != ""; });
+                    if (parts.length == 1) {
+                        if (current_dir['_files_'] == null) {
+                            current_dir['_files_'] = [];
+                        }
+                        current_dir['_files_'].push(parts[0]);
+                    }
+                    else {
+                        var dir = parts[0];
+                        if (current_dir[dir] == null) {
+                            current_dir[dir] = { '...': {}, '_files_': [] };
+                        }
+                        ;
+                        if (parts.length == 2) {
+                            if (parts[1].indexOf('.') != -1) {
+                                current_dir[dir]['_files_'].push(parts[1]);
+                            }
+                            else {
+                                current_dir[dir][parts[1]] = { '...': {}, '_files_': [] };
+                            }
+                        }
+                        else {
+                            parts.shift();
+                            var new_path = parts.reduce(this.reduce_path, '');
+                            this.create_file_path(new_path, current_dir[dir]);
+                        }
                     }
                 }
-                get_files() {
-                    this.utils.ajax.get({
-                        path: '/files/files_list',
-                        callback: (data) => {
-                            this.load_files(data);
-                            this.load_dir();
-                        },
-                        error: (err) => {
-                            alert('Error loading files');
-                        }
-                    });
-                }
-                load_dir() {
+                buildDirectory(data) {
                     var files = [], folders = [];
-                    var dir = this.get_directory();
+                    var dir = data.current_directory;
                     if (dir != null) {
                         if (dir['_files_'] != null) {
                             files = dir['_files_'];
@@ -180,13 +183,10 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                             }
                         }
                     }
-                    this.visible_files = files;
-                    this.visible_folders = folders;
                     $('.selected_block').removeClass('selected_block');
-                    setTimeout(() => {
-                        this.register_drag_drop();
-                        this.show_files();
-                    }, 500);
+                    data.visible_files = files;
+                    data.visible_folders = folders;
+                    return data;
                 }
                 show_loader() {
                     this.nav.show_loader = 'show';
@@ -196,16 +196,23 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                     this.nav.show_loader = 'hide';
                     this.nav.show_files = 'show';
                 }
-                click_upload_files() {
-                    var files = $(this).get(0).files;
-                    if (files.length > 0) {
-                        var formData = new FormData();
-                        for (var i = 0; i < files.length; i++) {
-                            var file = files[i];
-                            formData.append('uploads[]', file, file.name);
-                        }
-                        this.upload(formData);
+                step_into(folder) {
+                    var data = {
+                        directory: this.directory,
+                        current_path: this.current_path + '/' + folder
+                    };
+                    data = this.getDirectory(data);
+                    this.renderDirectory(this.buildDirectory(data));
+                }
+                step_back() {
+                    var tmp = this.current_path.split('/');
+                    var path = "";
+                    for (var i = 1; i < tmp.length - 1; i++) {
+                        path += "/" + tmp[i];
                     }
+                    var data = { directory: this.directory, current_path: path };
+                    data = this.getDirectory(data);
+                    this.renderDirectory(this.buildDirectory(data));
                 }
                 register_drag_drop() {
                     var move = (from, to, is_folder) => {
@@ -225,29 +232,69 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                         }
                     });
                 }
-                get_directory() {
-                    var dir = this.directory;
-                    var tmp = this.current_path.split('/');
-                    var path;
-                    for (var i = 1; i < tmp.length; i++) {
-                        path = tmp[i];
-                        dir = dir[path];
+                //File Processing Algorithms
+                move_object(obj, folder, is_folder) {
+                    this.show_loader();
+                    var old_path = this.current_path + '/' + obj;
+                    var dest;
+                    if (folder == "...") {
+                        var tmp = this.current_path.split('/');
+                        tmp.pop();
+                        tmp = tmp.filter((val) => { return val != ""; });
+                        dest = tmp.reduce(this.reduce_path, '');
+                        dest += ("/" + obj);
                     }
-                    return dir;
-                }
-                step_into(folder) {
-                    this.current_path += "/" + folder;
-                    this.load_dir();
-                }
-                step_back() {
-                    var tmp = this.current_path.split('/');
-                    var path = "";
-                    for (var i = 1; i < tmp.length - 1; i++) {
-                        path += "/" + tmp[i];
+                    else {
+                        dest = this.current_path + "/" + folder + "/" + obj;
                     }
-                    this.current_path = path;
-                    this.load_dir();
+                    var data = {
+                        data: { old_name: old_path, new_name: dest },
+                        url: '/files/rename',
+                        type: 'POST'
+                    };
+                    this.fn.fn_Ajax(data)
+                        .then(() => { this.post_move(old_path, dest); })
+                        .catch((err) => {
+                        console.log(err.responseText);
+                        this.show_files();
+                    });
                 }
+                post_move(old_path, new_path) {
+                    var ind = this.files.indexOf(old_path.substring(1));
+                    if (ind != -1) {
+                        this.files[ind] = new_path.substring(1);
+                    }
+                    var data = { files: this.files };
+                    this.startRender(data);
+                }
+                upload_files_selected() {
+                    var files = $('#upload-input').get(0).files;
+                    if (files.length > 0) {
+                        var formData = new FormData();
+                        for (var i = 0; i < files.length; i++) {
+                            var file = files[i];
+                            formData.append('uploads[]', file, file.name);
+                        }
+                        this.upload(formData);
+                    }
+                }
+                upload(formData) {
+                    var data = {
+                        url: '/files/upload',
+                        type: 'POST',
+                        headers: {
+                            'x-path': this.current_path
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    };
+                    this.fn.fn_Ajax(data)
+                        .then(() => {
+                        this.getFiles();
+                    });
+                }
+                //Folder / File Selection
                 select_block(elem, index, type) {
                     var select;
                     if (this.cntl_enabled) {
@@ -314,87 +361,7 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                     }
                     return count;
                 }
-                move_object(obj, folder, is_folder) {
-                    this.show_loader();
-                    var old_path = this.current_path + '/' + obj;
-                    var dest;
-                    if (folder == "...") {
-                        var tmp = this.current_path.split('/');
-                        dest = "";
-                        for (var i = 1; i < tmp.length - 1; i++) {
-                            dest += "/" + tmp[i];
-                        }
-                        dest += ("/" + obj);
-                    }
-                    else {
-                        dest = this.current_path + "/" + folder + "/" + obj;
-                    }
-                    this.utils.ajax.post({
-                        path: '/files/rename',
-                        data: {
-                            old_name: old_path,
-                            new_name: dest
-                        },
-                        callback: (data) => {
-                            this.post_move(obj, folder, is_folder);
-                        },
-                        error: (err) => {
-                            alert('Error moving file');
-                            console.error(err.responseText);
-                        }
-                    });
-                }
-                post_move(obj, folder, is_folder) {
-                    var old_directory = this.get_directory();
-                    if (folder != "...") {
-                        this.step_into(folder);
-                    }
-                    else {
-                        this.step_back();
-                    }
-                    var new_directory = this.get_directory();
-                    if (is_folder) {
-                        var copy_obj = $.extend({}, old_directory[obj]);
-                        delete old_directory[obj];
-                        new_directory[obj] = copy_obj;
-                    }
-                    else {
-                        var index = old_directory['_files_'].indexOf(obj);
-                        old_directory['_files_'].splice(index, 1);
-                        new_directory['_files_'].push(obj);
-                    }
-                    this.load_dir();
-                }
-                post_files(formData) {
-                    $.ajax({
-                        url: '/files/upload',
-                        type: 'POST',
-                        headers: {
-                            'x-path': this.current_path
-                        },
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: (data) => {
-                            console.log('upload successful!');
-                            this.insert_files(data);
-                        },
-                        error: function (data) {
-                            console.error(data.responseText);
-                            alert('Error uploading files');
-                        }
-                    });
-                }
-                insert_files(data) {
-                    var dir = this.get_directory();
-                    if (dir['_files_'] == null) {
-                        dir['_files_'] = [];
-                    }
-                    for (var i = 0; i < data.length; i++) {
-                        dir['_files_'].push(data[i]);
-                    }
-                    this.load_dir();
-                }
+                //Event Aggregator Functions
                 screenResize(size = null) {
                     var height;
                     if (size == null) {
@@ -405,12 +372,6 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                     }
                     height = height - 195;
                     $(".panel-body").css('height', height + 'px');
-                }
-                loadPage(page) {
-                    this.current_path = '/' + page;
-                    this.set_title(page);
-                    this.fn.ea.publish('react', { event_name: 'toggle_aside' });
-                    this.load_dir();
                 }
                 openFolder(data) {
                     if (data == "...") {
@@ -430,10 +391,10 @@ System.register(["aurelia-framework", "../../models/utilities", "../../models/Fn
                 }
             };
             Files = __decorate([
-                aurelia_framework_1.inject(utilities_1.Utilities, FnTs_1.FnTs),
-                __metadata("design:paramtypes", [utilities_1.Utilities, FnTs_1.FnTs])
+                aurelia_framework_1.inject(FnTs_1.FnTs), 
+                __metadata('design:paramtypes', [FnTs_1.FnTs])
             ], Files);
             exports_1("Files", Files);
         }
-    };
+    }
 });

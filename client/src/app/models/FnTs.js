@@ -56,6 +56,14 @@ System.register(['aurelia-framework', 'aurelia-event-aggregator'], function(expo
                         res(new_data);
                     });
                 }
+                fn_Reduce(data, fn) {
+                    return new Promise((res) => {
+                        var new_data = data.reduce((a, b) => {
+                            return fn(a, b);
+                        });
+                        res(new_data);
+                    });
+                }
                 fn_Ajax(data) {
                     return new Promise((res, err) => {
                         $.ajax({
@@ -63,6 +71,8 @@ System.register(['aurelia-framework', 'aurelia-event-aggregator'], function(expo
                             url: data.url,
                             headers: data.headers,
                             data: data.data,
+                            processData: data.processData,
+                            contentType: data.contentType,
                             success: (rslt) => { res(rslt); },
                             error: (ex) => { err(ex); }
                         });
@@ -72,6 +82,19 @@ System.register(['aurelia-framework', 'aurelia-event-aggregator'], function(expo
                     return new Promise((res) => {
                         var rslt = this.mergeSort(array, obj, direction);
                         res(rslt);
+                    });
+                }
+                fn_FindByKey(array, key, type = "dfs") {
+                    //'type' variable should be either dfs (depth first, default) or bfs (breadth first)
+                    return new Promise((res, err) => {
+                        if (type == "bfs") {
+                            var rslt = this.BfsByKey(array, key);
+                            res(rslt);
+                        }
+                        else {
+                            var rslt = this.DfsByKey(array, key);
+                            res(rslt);
+                        }
                     });
                 }
                 //output functions - useful for quick error handlers
@@ -146,6 +169,52 @@ System.register(['aurelia-framework', 'aurelia-event-aggregator'], function(expo
                     while (right.length)
                         result.push(right.shift());
                     return result;
+                }
+                DfsByKey(array, key, check_key = '') {
+                    if (key == check_key) {
+                        return array;
+                    }
+                    else {
+                        var keys = Object.keys(array), found;
+                        if (keys.length > 0) {
+                            for (var i = 0; i < keys.length; i++) {
+                                found = this.DfsByKey(array[keys[i]], key, keys[i]);
+                                if (found) {
+                                    return found;
+                                }
+                            }
+                        }
+                        else {
+                            return null;
+                        }
+                    }
+                }
+                BfsByKey(array, key) {
+                    var queue = [];
+                    var keys = Object.keys(array);
+                    for (var i = 0; i < keys.length; i++) {
+                        queue.push({
+                            key: keys[i],
+                            array: array
+                        });
+                    }
+                    var obj;
+                    while (queue.length > 0) {
+                        obj = queue.shift();
+                        if (obj.key == key) {
+                            return obj.array;
+                        }
+                        else {
+                            keys = Object.keys(obj.array[obj.key]);
+                            for (var i = 0; i < keys.length; i++) {
+                                queue.push({
+                                    key: keys[i],
+                                    array: obj.array[obj.key]
+                                });
+                            }
+                        }
+                    }
+                    return null;
                 }
             };
             FnTs = __decorate([

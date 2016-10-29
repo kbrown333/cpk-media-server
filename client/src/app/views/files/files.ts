@@ -1,15 +1,13 @@
 import {inject} from 'aurelia-framework';
-import {Utilities} from '../../models/utilities';
 import {FnTs} from '../../models/FnTs';
 
-@inject(Utilities, FnTs)
+@inject(FnTs)
 export class Files {
 
 	app_events: any;
 	files: any;
 	directory: any = {};
-	current_path: string = '/music';
-	display_path: string = 'Music';
+	current_path: string = '';
 	visible_folders: any;
 	visible_files: any;
 	selected_objects: any = [];
@@ -28,9 +26,10 @@ export class Files {
 		show_loader: 'show',
 		show_files: 'hide'
 	}
+	reduce_path = (a, b) => {return a + '/' + b;};
 
-	constructor(private utils: Utilities, private fn: FnTs) {
-		this.get_files();
+	constructor(private fn: FnTs) {
+		this.getFiles();
 	}
 
 	attached() {
@@ -44,77 +43,93 @@ export class Files {
 		$('body').keyup((event: JQueryEventObject) => {
 			if (event.which == 17) { this.cntl_enabled = false; }
 		});
+		$("#upload-input").on('change', () => {
+			this.upload_files_selected();
+		});
 	}
 
 	detached() {
 		this.app_events.dispose();
 	}
 
-	set_title(data: string) {
-		switch(data) {
-			case 'music':
-				this.display_path = 'Music';
-				break;
-			case 'documents':
-				this.display_path = 'Documents';
-				break;
-			case 'pictures':
-				this.display_path = 'Pictures';
-				break;
-			case 'videos':
-				this.display_path = 'Videos';
-				break;
-		}
+	private getFiles() {
+		this.fn.fn_Ajax({url: '/files/files_list'})
+			.then(this.startRender);
 	}
 
-	get_files(): void {
-		this.utils.ajax.get({
-			path: '/files/files_list',
-			callback: (data: any) => {
-				this.load_files(data);
-				this.load_dir();
-			},
-			error: (err: any) => {
-				alert('Error loading files');
+	startRender = (data: any) => {
+		this.BuildFolderStructure(data)
+			.then(this.getDirectory)
+			.then(this.buildDirectory)
+			.then(this.renderDirectory)
+			.catch(this.fn.logError);
+	}
+
+	renderDirectory =  (data: any) => {
+		this.current_path = data.current_path;
+		this.directory = data.directory;
+		this.visible_files = data.visible_files;
+		this.visible_folders = data.visible_folders;
+		if (data.files != null) { this.files = data.files; }
+		setTimeout(() => {
+			this.register_drag_drop();
+			this.show_files();
+		}, 500);
+	}
+
+	BuildFolderStructure = (data: any): Promise<any> => {
+		return new Promise((res, err) => {
+			var dir = {};
+			for (var i = 0; i < data.files.length; i++) {
+				this.create_file_path(data.files[i], dir);
 			}
+			res({
+				files: data.files,
+				directory: dir,
+				current_path: this.current_path
+			});
 		});
 	}
 
-	load_files = (data: any) => {
-		this.files = data.files;
-		var directory = {};
-		var str_i, str_j, tmp, dir, fname;
-		for (var i = 0; i < data.files.length; i++) {
-			str_i = data.files[i];
-			tmp = str_i.split('/');
-			if (tmp.length > 0) {
-				dir = directory;
-				for (var j = 0; j < tmp.length - 1; j++) {
-					str_j = tmp[j];
-					if (dir[str_j] == null) {
-						if (j > 0) {
-							dir[str_j] = {'...': {}};
-						} else {
-							dir[str_j] = {};
-						}
-					}
-					dir = dir[str_j];
+	create_file_path(path: string, current_dir: any) {
+		var parts = path.split('/').filter((val) => {return val != "";});
+		if (parts.length == 1) {
+			if (current_dir['_files_'] == null) { current_dir['_files_'] = []; }
+			current_dir['_files_'].push(parts[0]);
+		} else {
+			var dir = parts[0];
+			if (current_dir[dir] == null) {
+				current_dir[dir] = {'...': {}, '_files_': []}
+			};
+			if (parts.length == 2) {
+				if (parts[1].indexOf('.') != -1) {
+					current_dir[dir]['_files_'].push(parts[1]);
+				} else {
+					current_dir[dir][parts[1]] = {'...': {}, '_files_': []}
 				}
-				fname = tmp[tmp.length - 1];
-				if (dir['_files_'] == null) {
-					dir['_files_'] = [];
-				}
-				if (fname != "") {
-					dir['_files_'].push(fname);
-				}
+			} else {
+				parts.shift();
+				var new_path = parts.reduce(this.reduce_path, '');
+				this.create_file_path(new_path, current_dir[dir]);
 			}
 		}
-		this.directory = directory;
 	}
 
-	load_dir(): void {
+	getDirectory = (data: any): any => {
+		var dir = data.directory;
+		var tmp = data.current_path.split('/');
+		var path;
+		for (var i = 1; i < tmp.length; i++) {
+			path = tmp[i];
+			dir = dir[path];
+		}
+		data.current_directory = dir;
+		return data;
+	}
+
+	buildDirectory(data: any) {
 		var files = [], folders = [];
-		var dir = this.get_directory();
+		var dir = data.current_directory;
 		if (dir != null) {
 			if (dir['_files_'] != null) { files = dir['_files_']; }
 			for (var obj in dir) {
@@ -123,13 +138,10 @@ export class Files {
 				}
 			}
 		}
-		this.visible_files = files;
-		this.visible_folders = folders;
 		$('.selected_block').removeClass('selected_block');
-		setTimeout(() => {
-			this.register_drag_drop();
-			this.show_files();
-		}, 500);
+		data.visible_files = files;
+		data.visible_folders = folders;
+		return data;
 	}
 
 	show_loader() {
@@ -142,20 +154,24 @@ export class Files {
 		this.nav.show_files = 'show';
 	}
 
-	upload = (formData: FormData) => {
-		this.post_files(formData);
+	step_into(folder: string): void {
+		var data = {
+			directory: this.directory,
+			current_path: this.current_path + '/' + folder
+		};
+		data = this.getDirectory(data);
+		this.renderDirectory(this.buildDirectory(data));
 	}
 
-	click_upload_files() {
-		var files = (<HTMLInputElement>$(this).get(0)).files;
-	  	if (files.length > 0) {
-		  	var formData = new FormData();
-		  	for (var i = 0; i < files.length; i++) {
-			  	var file = files[i];
-			  	formData.append('uploads[]', file, file.name);
-		  	}
-		  	this.upload(formData);
-	  	}
+	step_back(): void {
+		var tmp = this.current_path.split('/');
+		var path = "";
+		for (var i = 1; i < tmp.length - 1; i++) {
+			path += "/" + tmp[i];
+		}
+		var data = {directory: this.directory, current_path: path};
+		data = this.getDirectory(data);
+		this.renderDirectory(this.buildDirectory(data));
 	}
 
 	register_drag_drop(): void {
@@ -177,32 +193,99 @@ export class Files {
 		});
 	}
 
-	get_directory(): any {
-		var dir = this.directory;
-		var tmp = this.current_path.split('/');
-		var path;
-		for (var i = 1; i < tmp.length; i++) {
-			path = tmp[i];
-			dir = dir[path];
+	//File Processing Algorithms
+	move_object(obj: string, folder: string, is_folder: boolean): void {
+		this.show_loader();
+		var old_path = this.current_path + '/' + obj;
+		var dest;
+		if (folder == "...") {
+			var tmp = this.current_path.split('/');
+			tmp.pop();
+			tmp = tmp.filter((val) => {return val != "";});
+			dest = tmp.reduce(this.reduce_path, '');
+			dest += ("/" + obj);
+		} else {
+			dest = this.current_path + "/" + folder + "/" + obj;
 		}
-		return dir;
+		var data = {
+			data: { old_name: old_path, new_name: dest },
+			url: '/files/rename',
+			type: 'POST'
+		};
+		this.fn.fn_Ajax(data)
+			.then(() => { this.post_move(old_path, dest) })
+			.catch((err) => {
+				console.log(err.responseText);
+				this.show_files();
+			});
 	}
 
-	step_into(folder: string): void {
-		this.current_path += "/" + folder;
-		this.load_dir();
-	}
-
-	step_back(): void {
-		var tmp = this.current_path.split('/');
-		var path = "";
-		for (var i = 1; i < tmp.length - 1; i++) {
-			path += "/" + tmp[i];
+	post_move(old_path: string, new_path: string) {
+		var ind = this.files.indexOf(old_path.substring(1));
+		if (ind != -1) {
+			this.files[ind] = new_path.substring(1);
 		}
-		this.current_path = path;
-		this.load_dir();
+		var data = { files: this.files };
+		this.startRender(data);
 	}
 
+	click_upload_btn = () => {
+		$('#upload-input').click();
+	}
+
+	upload_files_selected() {
+		var files = (<HTMLInputElement>$('#upload-input').get(0)).files;
+	  	if (files.length > 0) {
+		  	var formData = new FormData();
+		  	for (var i = 0; i < files.length; i++) {
+			  	var file = files[i];
+			  	formData.append('uploads[]', file, file.name);
+		  	}
+		  	this.upload(formData);
+	  	}
+	}
+
+	upload(formData: FormData) {
+		var data = {
+			url: '/files/upload',
+			type: 'POST',
+			headers: {
+				'x-path': this.current_path
+			},
+			data: formData,
+			processData: false,
+			contentType: false
+		}
+		this.fn.fn_Ajax(data)
+			.then(() => {
+				this.getFiles();
+			});
+	}
+
+	delete_files = () => {
+		this.show_loader();
+		var data = {
+			url: 'files/delete_files',
+			type: 'POST',
+			data: { files: this.selected_objects, path: this.current_path }
+		}
+		this.fn.fn_Ajax(data)
+			.then(() => {
+				this.getFiles();
+			});
+	}
+
+	download_file = () => {
+		var items = this.selected_objects;
+		if (items.length > 1) {
+			alert('Only 1 file at a time allowed for downloads');
+		}
+		var rt = this.current_path + '/';
+		var file = rt + items[0];
+		window.open('/files/download_files?file=' + file);
+	}
+
+	//Folder / File Selection
 	select_block(elem: any, index: number, type: string): void {
 		var select;
 		if (this.cntl_enabled) {
@@ -261,127 +344,6 @@ export class Files {
 		return count;
 	}
 
-	move_object(obj: string, folder: string, is_folder: boolean): void {
-		this.show_loader();
-		var old_path = this.current_path + '/' + obj;
-		var dest;
-		if (folder == "...") {
-			var tmp = this.current_path.split('/');
-			dest = "";
-			for (var i = 1; i < tmp.length - 1; i++) {
-				dest += "/" + tmp[i];
-			}
-			dest += ("/" + obj);
-		} else {
-			dest = this.current_path + "/" + folder + "/" + obj;
-		}
-		this.utils.ajax.post({
-			path: '/files/rename',
-			data: {
-				old_name: old_path,
-				new_name: dest
-			},
-			callback: (data: any) => {
-				this.post_move(obj, folder, is_folder);
-			},
-			error: (err: any) => {
-				alert('Error moving file');
-				console.error(err.responseText);
-			}
-		});
-	}
-
-	post_move(obj: string, folder: string, is_folder: boolean) {
-		var old_directory = this.get_directory();
-		if (folder != "...") {
-			this.step_into(folder);
-		} else {
-			this.step_back();
-		}
-		var new_directory = this.get_directory();
-		if (is_folder) {
-			var copy_obj = $.extend({}, old_directory[obj]);
-			delete old_directory[obj];
-			new_directory[obj] = copy_obj;
-		} else {
-			var index = old_directory['_files_'].indexOf(obj);
-			old_directory['_files_'].splice(index, 1);
-			new_directory['_files_'].push(obj);
-		}
-		this.load_dir();
-	}
-
-	post_files(formData: FormData) {
-		$.ajax({
-			url: '/files/upload',
-			type: 'POST',
-			headers: {
-				'x-path': this.current_path
-			},
-			data: formData,
-			processData: false,
-			contentType: false,
-			success: (data) => {
-			 	console.log('upload successful!');
-			 	this.insert_files(data);
-			},
-			error: function(data) {
-				console.error(data.responseText);
-				alert('Error uploading files');
-			}
-		});
-	}
-
-	insert_files(data: any) {
-		var dir = this.get_directory();
-		if (dir['_files_'] == null) {
-			dir['_files_'] = [];
-		}
-		for(var i = 0; i < data.length; i++) {
-			dir['_files_'].push(data[i]);
-		}
-		this.load_dir();
-	}
-
-	delete_files = () => {
-		this.show_loader();
-		this.utils.ajax.post({
-			path: '/files/delete_files',
-			data: {
-				files: this.selected_objects,
-				path: this.current_path
-			},
-			callback: (data: any) => {
-				this.get_files();
-			},
-			error: (data: any) => {
-				console.error(data.responseText);
-			}
-		});
-	}
-
-	download_file = () => {
-		var items = this.selected_objects;
-		if (items.length > 1) {
-			alert('Only 1 file at a time allowed for downloads');
-		}
-		var rt = this.current_path + '/';
-		var file = rt + items[0];
-		window.open('/files/download_files?file=' + file);
-	}
-
-	edit_file = () => {
-		var x = 1;
-	}
-
-	add_folder = () => {
-		var x = 1;
-	}
-
-	upload_file = () => {
-		$('#upload-input').click();
-	}
-
 	//Event Aggregator Functions
 	screenResize(size: any = null): void {
 		var height;
@@ -389,13 +351,6 @@ export class Files {
 		else { height = size.height }
 		height = height - 195;
 		$(".panel-body").css('height', height + 'px');
-	}
-
-	loadPage(page: string) {
-		this.current_path = '/' + page;
-		this.set_title(page);
-		this.fn.ea.publish('react', {event_name: 'toggle_aside'});
-		this.load_dir();
 	}
 
 	openFolder(data: string) {

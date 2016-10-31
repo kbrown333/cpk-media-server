@@ -99,6 +99,10 @@ aside {
 	padding: 10px 20px;
 }
 
+input.form-control {
+    color: black;
+}
+
 /*Files Page*/
 .icon-row {
     width: 80%;

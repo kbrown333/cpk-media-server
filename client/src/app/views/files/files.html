@@ -6,6 +6,7 @@
     <require from="../../attributes/one-click"></require>
     <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
     <cpk-modal modal="edit_fname" view="./modal/edit-fname"></cpk-modal>
+    <cpk-modal modal="add_folder" view="./modal/add-folder"></cpk-modal>
 	<div class="container host_container">
         <div class="row show_on_mobile">
             <div style="float: right; margin: 0px 20px 15px 0px;">
@@ -14,8 +15,8 @@
                 <i class="fa fa-download panel-hdr-btn download_btn"
                     toggle-me.two-way="hdr_btns.select_single" click.delegate="download_file()"></i>
                 <i class="fa fa-pencil panel-hdr-btn edit_btn" toggle-me.two-way="hdr_btns.select_single"
-                    click.delegate="edit_file()"></i>
-                <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="add_folder()"></i>
+                    click.delegate="open_rename_modal()"></i>
+                <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="open_add_folder()"></i>
                 <i class="fa fa-upload panel-hdr-btn upload_btn" click.delegate="click_upload_btn()"></i>
             </div>
         </div>
@@ -36,7 +37,7 @@
                                 toggle-me.two-way="hdr_btns.select_single" click.delegate="download_file()"></i>
                             <i class="fa fa-pencil panel-hdr-btn edit_btn" toggle-me.two-way="hdr_btns.select_single"
                                 click.delegate="open_rename_modal()"></i>
-                            <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="add_folder()"></i>
+                            <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="open_add_folder()"></i>
                             <i class="fa fa-upload panel-hdr-btn upload_btn" click.delegate="click_upload_btn()"></i>
                         </div>
                     </div>

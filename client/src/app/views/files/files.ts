@@ -321,6 +321,29 @@ export class Files {
 			.then(() => { this.getFiles(); });
 	}
 
+	open_add_folder = () => {
+		this.fn.ea.publish('react', {
+			event_name: 'showModal',
+			data: {
+				modal: 'add_folder',
+				content: {
+					title: 'Add New Folder',
+					fname: ''
+				}
+			}
+		});
+	}
+
+	add_new_folder(folder_name: string) {
+		var data = {
+			type: 'POST',
+			url: 'files/new_folder',
+			data: {path: this.current_path + '/' + folder_name}
+		}
+		this.fn.fn_Ajax(data)
+			.then(() => { this.getFiles(); });
+	}
+
 	//Folder / File Selection
 	select_block(elem: any, index: number, type: string): void {
 		var select;
@@ -419,6 +442,9 @@ export class Files {
 		switch (data.modal) {
 			case 'edit_fname':
 				this.rename_file(this.selected_objects[0], data.content.fname);
+				break;
+			case 'add_folder':
+				this.add_new_folder(data.content.fname);
 				break;
 		}
 	}

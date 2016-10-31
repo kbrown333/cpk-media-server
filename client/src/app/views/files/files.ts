@@ -7,7 +7,7 @@ export class Files {
 	app_events: any;
 	files: any;
 	directory: any = {};
-	current_path: string = '';
+	current_path: string = '/music';
 	visible_folders: any;
 	visible_files: any;
 	selected_objects: any = [];
@@ -17,7 +17,7 @@ export class Files {
         {name: 'Videos', event: 'loadPage', data: 'videos'},
         {name: 'Pictures', event: 'loadPage', data: 'pictures'},
         {name: 'Documents', event: 'loadPage', data: 'documents'}
-  	];
+	];
 	hdr_btns: any = {
 		select_all: 'hide',
 		select_single: 'hide'
@@ -52,9 +52,24 @@ export class Files {
 		this.app_events.dispose();
 	}
 
-	private getFiles() {
-		this.fn.fn_Ajax({url: '/files/files_list'})
-			.then(this.startRender);
+	show_loader() {
+		this.nav.show_loader = 'show';
+		this.nav.show_files = 'hide';
+	}
+
+	show_files() {
+		this.nav.show_loader = 'hide';
+		this.nav.show_files = 'show';
+	}
+
+	private getFiles(): Promise<any> {
+		return new Promise((res) => {
+			this.fn.fn_Ajax({url: '/files/files_list'})
+				.then(this.startRender)
+				.then(() => {
+					res();
+				});
+		});
 	}
 
 	startRender = (data: any) => {
@@ -79,7 +94,12 @@ export class Files {
 
 	BuildFolderStructure = (data: any): Promise<any> => {
 		return new Promise((res, err) => {
-			var dir = {};
+			var dir = {
+				music: {'_files_': []},
+				videos: {'_files_': []},
+				pictures: {'_files_': []},
+				documents: {'_files_': []},
+			};
 			for (var i = 0; i < data.files.length; i++) {
 				this.create_file_path(data.files[i], dir);
 			}
@@ -142,16 +162,6 @@ export class Files {
 		data.visible_files = files;
 		data.visible_folders = folders;
 		return data;
-	}
-
-	show_loader() {
-		this.nav.show_loader = 'show';
-		this.nav.show_files = 'hide';
-	}
-
-	show_files() {
-		this.nav.show_loader = 'hide';
-		this.nav.show_files = 'show';
 	}
 
 	step_into(folder: string): void {
@@ -222,10 +232,12 @@ export class Files {
 
 	post_move(old_path: string, new_path: string) {
 		var ind = this.files.indexOf(old_path.substring(1));
+		var files = $.extend(true, [], this.files);
 		if (ind != -1) {
-			this.files[ind] = new_path.substring(1);
+			files.splice(ind, 1);
+			files.push(new_path.substring(1));
 		}
-		var data = { files: this.files };
+		var data = { files: files };
 		this.startRender(data);
 	}
 
@@ -270,9 +282,7 @@ export class Files {
 			data: { files: this.selected_objects, path: this.current_path }
 		}
 		this.fn.fn_Ajax(data)
-			.then(() => {
-				this.getFiles();
-			});
+			.then(() => { this.getFiles(); });
 	}
 
 	download_file = () => {
@@ -283,6 +293,32 @@ export class Files {
 		var rt = this.current_path + '/';
 		var file = rt + items[0];
 		window.open('/files/download_files?file=' + file);
+	}
+
+	open_rename_modal = () => {
+		this.fn.ea.publish('react', {
+			event_name: 'showModal',
+			data: {
+				modal: 'edit_fname',
+				content: {
+					title: 'Edit File Name',
+					fname: this.selected_objects[0]
+				}
+			}
+		});
+	}
+
+	rename_file = (old_name: string, new_name: string) => {
+		var data = {
+			type: 'POST',
+			url: 'files/rename',
+			data: {
+				old_name: this.current_path + '/' + old_name,
+				new_name: this.current_path + '/' + new_name
+			}
+		}
+		this.fn.fn_Ajax(data)
+			.then(() => { this.getFiles(); });
 	}
 
 	//Folder / File Selection
@@ -346,11 +382,19 @@ export class Files {
 
 	//Event Aggregator Functions
 	screenResize(size: any = null): void {
-		var height;
-		if (size == null) { height = $(window).height(); }
-		else { height = size.height }
-		height = height - 195;
+		var height, width;
+		if (size == null) { height = $(window).height(); width = $(window).width(); }
+		else { height = size.height; width = size.width; }
+		var offset = width > 768 ? 150 : 190;
+		height = height - offset;
 		$(".panel-body").css('height', height + 'px');
+	}
+
+	loadPage(page: string) {
+		this.current_path = '/' + page;
+		this.fn.ea.publish('react', {event_name: 'toggle_aside'});
+		var data = { files: this.files };
+		this.startRender(data);
 	}
 
 	openFolder(data: string) {
@@ -369,6 +413,14 @@ export class Files {
 	selectFile(index: number) {
 		var elem = $($('.icon-block[block-type="file"]')[index]);
 		this.select_block(elem, index, 'file');
+	}
+
+	onModalClose(data: any) {
+		switch (data.modal) {
+			case 'edit_fname':
+				this.rename_file(this.selected_objects[0], data.content.fname);
+				break;
+		}
 	}
 
 }

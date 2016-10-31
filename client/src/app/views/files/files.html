@@ -1,10 +1,24 @@
 <template>
     <require from="../../elements/aside"></require>
+    <require from="../../elements/cpk-modal"></require>
     <require from="../../attributes/toggle-me"></require>
     <require from="../../attributes/dbl-click"></require>
     <require from="../../attributes/one-click"></require>
     <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
+    <cpk-modal modal="edit_fname" view="./modal/edit-fname"></cpk-modal>
 	<div class="container host_container">
+        <div class="row show_on_mobile">
+            <div style="float: right; margin: 0px 20px 15px 0px;">
+                <i class="fa fa-times panel-hdr-btn delete_btn" toggle-me.two-way="hdr_btns.select_all"
+                    click.delegate="delete_files()"></i>
+                <i class="fa fa-download panel-hdr-btn download_btn"
+                    toggle-me.two-way="hdr_btns.select_single" click.delegate="download_file()"></i>
+                <i class="fa fa-pencil panel-hdr-btn edit_btn" toggle-me.two-way="hdr_btns.select_single"
+                    click.delegate="edit_file()"></i>
+                <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="add_folder()"></i>
+                <i class="fa fa-upload panel-hdr-btn upload_btn" click.delegate="click_upload_btn()"></i>
+            </div>
+        </div>
         <div class="row">
             <div class="col-xs-12">
                 <div class="panel panel-danger">
@@ -13,20 +27,20 @@
                     		<i class="fa fa-table"></i>
                     	</div>
                         <div style="display: inline-block;">
-                            <h3 class="panel-title">${display_path}</h3>
+                            <h3 class="panel-title">${current_path}</h3>
                         </div>
-                        <div style="display: inline-block; float: right;">
+                        <div class="show_on_monitor" style="display: inline-block; float: right;">
                             <i class="fa fa-times panel-hdr-btn delete_btn" toggle-me.two-way="hdr_btns.select_all"
                                 click.delegate="delete_files()"></i>
                             <i class="fa fa-download panel-hdr-btn download_btn"
                                 toggle-me.two-way="hdr_btns.select_single" click.delegate="download_file()"></i>
                             <i class="fa fa-pencil panel-hdr-btn edit_btn" toggle-me.two-way="hdr_btns.select_single"
-                                click.delegate="edit_file()"></i>
+                                click.delegate="open_rename_modal()"></i>
                             <i class="fa fa-plus panel-hdr-btn new_folder_btn" click.delegate="add_folder()"></i>
-                            <i class="fa fa-upload panel-hdr-btn upload_btn" click.delegate="upload_file()"></i>
+                            <i class="fa fa-upload panel-hdr-btn upload_btn" click.delegate="click_upload_btn()"></i>
                         </div>
                     </div>
-                    <input id="upload-input" type="file" name="uploads[]" multiple="multiple" style="display: none;"></br>
+                    <input id="upload-input" type="file" name="uploads[]" multiple="multiple" style="display: none;">
                     <div class="panel-body">
                         <div class="row" toggle-me.two-way="nav.show_loader">
                             <div class="col-xs-12" style="color: white; text-align: center; margin-top: 20px;">

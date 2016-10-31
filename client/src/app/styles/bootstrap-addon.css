@@ -67,6 +67,38 @@ aside {
     font: 14px/1.5 Ariel, Helvetica, sans-serif;
 }
 
+.cpk-modal {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1500;
+	background-color: transparent;
+}
+.modal-back {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 1400;
+	opacity: .6;
+	background-color: black;
+}
+.modal-dialog {
+	background-color: black;
+	color: white;
+	border: 1px solid #ce7070;
+	border-radius: 10px;
+}
+.modal-header {
+	font-family: 'Comfortaa', cursive;
+}
+.modal-footer {
+	padding: 10px 20px;
+}
+
 /*Files Page*/
 .icon-row {
     width: 80%;
@@ -95,6 +127,8 @@ aside {
 }
 .panel-heading {
     font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .panel-body {
     overflow: auto;
@@ -132,18 +166,18 @@ i.delete_btn {
 
 @media(min-width: 768px) {
     .show_on_monitor {
-        display: block;
+        display: block !important;
     }
     .show_on_mobile {
-        display: none;
+        display: none !important;
     }
 }
 @media(max-width: 767px) {
     .show_on_mobile {
-        display: block;
+        display: block !important;
     }
     .show_on_monitor {
-        display: none;
+        display: none !important;
     }
     .date_controls {
         float: left;

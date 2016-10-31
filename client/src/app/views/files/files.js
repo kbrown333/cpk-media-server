@@ -1,6 +1,5 @@
-System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, context_1) {
+System.register(["aurelia-framework", "../../models/FnTs"], function (exports_1, context_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -10,22 +9,23 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var aurelia_framework_1, FnTs_1;
-    var Files;
+    var __moduleName = context_1 && context_1.id;
+    var aurelia_framework_1, FnTs_1, Files;
     return {
-        setters:[
+        setters: [
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
             function (FnTs_1_1) {
                 FnTs_1 = FnTs_1_1;
-            }],
-        execute: function() {
+            }
+        ],
+        execute: function () {
             Files = class Files {
                 constructor(fn) {
                     this.fn = fn;
                     this.directory = {};
-                    this.current_path = '';
+                    this.current_path = '/music';
                     this.selected_objects = [];
                     this.cntl_enabled = false;
                     this.aside_links = [
@@ -65,7 +65,12 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                     };
                     this.BuildFolderStructure = (data) => {
                         return new Promise((res, err) => {
-                            var dir = {};
+                            var dir = {
+                                music: { '_files_': [] },
+                                videos: { '_files_': [] },
+                                pictures: { '_files_': [] },
+                                documents: { '_files_': [] },
+                            };
                             for (var i = 0; i < data.files.length; i++) {
                                 this.create_file_path(data.files[i], dir);
                             }
@@ -98,9 +103,7 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                             data: { files: this.selected_objects, path: this.current_path }
                         };
                         this.fn.fn_Ajax(data)
-                            .then(() => {
-                            this.getFiles();
-                        });
+                            .then(() => { this.getFiles(); });
                     };
                     this.download_file = () => {
                         var items = this.selected_objects;
@@ -110,6 +113,30 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                         var rt = this.current_path + '/';
                         var file = rt + items[0];
                         window.open('/files/download_files?file=' + file);
+                    };
+                    this.open_rename_modal = () => {
+                        this.fn.ea.publish('react', {
+                            event_name: 'showModal',
+                            data: {
+                                modal: 'edit_fname',
+                                content: {
+                                    title: 'Edit File Name',
+                                    fname: this.selected_objects[0]
+                                }
+                            }
+                        });
+                    };
+                    this.rename_file = (old_name, new_name) => {
+                        var data = {
+                            type: 'POST',
+                            url: 'files/rename',
+                            data: {
+                                old_name: this.current_path + '/' + old_name,
+                                new_name: this.current_path + '/' + new_name
+                            }
+                        };
+                        this.fn.fn_Ajax(data)
+                            .then(() => { this.getFiles(); });
                     };
                     this.getFiles();
                 }
@@ -137,9 +164,22 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                 detached() {
                     this.app_events.dispose();
                 }
+                show_loader() {
+                    this.nav.show_loader = 'show';
+                    this.nav.show_files = 'hide';
+                }
+                show_files() {
+                    this.nav.show_loader = 'hide';
+                    this.nav.show_files = 'show';
+                }
                 getFiles() {
-                    this.fn.fn_Ajax({ url: '/files/files_list' })
-                        .then(this.startRender);
+                    return new Promise((res) => {
+                        this.fn.fn_Ajax({ url: '/files/files_list' })
+                            .then(this.startRender)
+                            .then(() => {
+                            res();
+                        });
+                    });
                 }
                 create_file_path(path, current_dir) {
                     var parts = path.split('/').filter((val) => { return val != ""; });
@@ -188,14 +228,6 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                     data.visible_folders = folders;
                     return data;
                 }
-                show_loader() {
-                    this.nav.show_loader = 'show';
-                    this.nav.show_files = 'hide';
-                }
-                show_files() {
-                    this.nav.show_loader = 'hide';
-                    this.nav.show_files = 'show';
-                }
                 step_into(folder) {
                     var data = {
                         directory: this.directory,
@@ -232,7 +264,6 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                         }
                     });
                 }
-                //File Processing Algorithms
                 move_object(obj, folder, is_folder) {
                     this.show_loader();
                     var old_path = this.current_path + '/' + obj;
@@ -261,10 +292,12 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                 }
                 post_move(old_path, new_path) {
                     var ind = this.files.indexOf(old_path.substring(1));
+                    var files = $.extend(true, [], this.files);
                     if (ind != -1) {
-                        this.files[ind] = new_path.substring(1);
+                        files.splice(ind, 1);
+                        files.push(new_path.substring(1));
                     }
-                    var data = { files: this.files };
+                    var data = { files: files };
                     this.startRender(data);
                 }
                 upload_files_selected() {
@@ -294,7 +327,6 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                         this.getFiles();
                     });
                 }
-                //Folder / File Selection
                 select_block(elem, index, type) {
                     var select;
                     if (this.cntl_enabled) {
@@ -361,17 +393,25 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                     }
                     return count;
                 }
-                //Event Aggregator Functions
                 screenResize(size = null) {
-                    var height;
+                    var height, width;
                     if (size == null) {
                         height = $(window).height();
+                        width = $(window).width();
                     }
                     else {
                         height = size.height;
+                        width = size.width;
                     }
-                    height = height - 195;
+                    var offset = width > 768 ? 150 : 190;
+                    height = height - offset;
                     $(".panel-body").css('height', height + 'px');
+                }
+                loadPage(page) {
+                    this.current_path = '/' + page;
+                    this.fn.ea.publish('react', { event_name: 'toggle_aside' });
+                    var data = { files: this.files };
+                    this.startRender(data);
                 }
                 openFolder(data) {
                     if (data == "...") {
@@ -389,12 +429,19 @@ System.register(['aurelia-framework', '../../models/FnTs'], function(exports_1, 
                     var elem = $($('.icon-block[block-type="file"]')[index]);
                     this.select_block(elem, index, 'file');
                 }
+                onModalClose(data) {
+                    switch (data.modal) {
+                        case 'edit_fname':
+                            this.rename_file(this.selected_objects[0], data.content.fname);
+                            break;
+                    }
+                }
             };
             Files = __decorate([
-                aurelia_framework_1.inject(FnTs_1.FnTs), 
-                __metadata('design:paramtypes', [FnTs_1.FnTs])
+                aurelia_framework_1.inject(FnTs_1.FnTs),
+                __metadata("design:paramtypes", [FnTs_1.FnTs])
             ], Files);
             exports_1("Files", Files);
         }
-    }
+    };
 });

@@ -1,6 +1,5 @@
-System.register(["aurelia-framework", "aurelia-router", './models/session', './models/FnTs'], function(exports_1, context_1) {
+System.register(["aurelia-framework", "aurelia-router", "./models/session", "./models/FnTs"], function (exports_1, context_1) {
     "use strict";
-    var __moduleName = context_1 && context_1.id;
     var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
         var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
         if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -10,10 +9,10 @@ System.register(["aurelia-framework", "aurelia-router", './models/session', './m
     var __metadata = (this && this.__metadata) || function (k, v) {
         if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
     };
-    var aurelia_framework_1, aurelia_router_1, session_1, FnTs_1;
-    var App;
+    var __moduleName = context_1 && context_1.id;
+    var aurelia_framework_1, aurelia_router_1, session_1, FnTs_1, App;
     return {
-        setters:[
+        setters: [
             function (aurelia_framework_1_1) {
                 aurelia_framework_1 = aurelia_framework_1_1;
             },
@@ -25,15 +24,14 @@ System.register(["aurelia-framework", "aurelia-router", './models/session', './m
             },
             function (FnTs_1_1) {
                 FnTs_1 = FnTs_1_1;
-            }],
-        execute: function() {
+            }
+        ],
+        execute: function () {
             App = class App {
-                //APPLICATION LOAD FUNCTIONS
                 constructor(router, session, fn) {
                     this.router = router;
                     this.session = session;
                     this.fn = fn;
-                    //APP EVENTS
                     this.toggle_header = () => {
                         $(".collapse").toggle();
                     };
@@ -51,11 +49,10 @@ System.register(["aurelia-framework", "aurelia-router", './models/session', './m
                     this.router.configure((config) => {
                         config.title = "CPK Media";
                         config.map([
-                            { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dash' },
-                            { route: ['files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
+                            { route: ['', 'files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
                             { route: ['music'], name: 'music', moduleId: './views/music/music', nav: true, title: 'Music' },
-                            { route: ['pictures'], name: 'pictures', moduleId: './views/pictures/pictures', nav: true, title: 'Images' },
                             { route: ['videos'], name: 'videos', moduleId: './views/videos/videos', nav: true, title: 'Videos' },
+                            { route: ['pictures'], name: 'pictures', moduleId: './views/pictures/pictures', nav: true, title: 'Images' },
                         ]);
                         return config;
                     });
@@ -87,10 +84,10 @@ System.register(["aurelia-framework", "aurelia-router", './models/session', './m
                 }
             };
             App = __decorate([
-                aurelia_framework_1.inject(aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs), 
-                __metadata('design:paramtypes', [aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs])
+                aurelia_framework_1.inject(aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs),
+                __metadata("design:paramtypes", [aurelia_router_1.Router, session_1.SessionData, FnTs_1.FnTs])
             ], App);
             exports_1("App", App);
         }
-    }
+    };
 });

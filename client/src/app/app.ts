@@ -19,11 +19,10 @@ export class App {
         this.router.configure((config: RouterConfiguration): RouterConfiguration => {
             config.title = "CPK Media";
             config.map([
-                { route: ['', 'dash'], name: 'dash', moduleId: './views/dashboard/dash', nav: true, title: 'Dash' },
-                { route: ['files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
+                { route: ['', 'files'], name: 'files', moduleId: './views/files/files', nav: true, title: 'Files' },
                 { route: ['music'], name: 'music', moduleId: './views/music/music', nav: true, title: 'Music' },
-                { route: ['pictures'], name: 'pictures', moduleId: './views/pictures/pictures', nav: true, title: 'Images' },
                 { route: ['videos'], name: 'videos', moduleId: './views/videos/videos', nav: true, title: 'Videos' },
+                { route: ['pictures'], name: 'pictures', moduleId: './views/pictures/pictures', nav: true, title: 'Images' },
             ]);
             return config;
         });

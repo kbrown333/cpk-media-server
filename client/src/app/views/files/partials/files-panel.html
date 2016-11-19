@@ -67,7 +67,8 @@
 									<input class="hidden_input" value.bind="file" />
 									<div class="icon-row">
 										<i class="fa fa-file-o fa-3x"
-											one-click="event.bind: 'selectFile'; data.bind: $index;"></i>
+											one-click="event.bind: 'selectFile'; data.bind: $index;"
+											dbl-click="event.bind: 'openFile'; data.bind: file"></i>
 									</div>
 									<div class="icon-row">
 										<span>${file}</span>

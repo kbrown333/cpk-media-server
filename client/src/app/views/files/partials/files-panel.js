@@ -424,6 +424,16 @@ System.register(["aurelia-framework", "../../../models/FnTs"], function (exports
                         this.step_into(data);
                     }
                 }
+                openFile(file) {
+                    var types = {
+                        'mp3': 'loadMusicFile',
+                        'mp4': 'loadVideoFile'
+                    };
+                    var ext = file.substring(file.lastIndexOf('.') + 1);
+                    var event = types[ext];
+                    var data = this.current_path + '/' + file;
+                    this.fn.ea.publish('react', { event_name: event, data: data });
+                }
                 selectFolder(index) {
                     var elem = $($('.icon-block[block-type="folder"]')[index]);
                     this.select_block(elem, index, 'folder');

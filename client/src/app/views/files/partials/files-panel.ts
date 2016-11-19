@@ -417,6 +417,17 @@ export class FilesPanel {
 		}
 	}
 
+	openFile(file: any) {
+		var types = {
+			'mp3': 'loadMusicFile',
+			'mp4': 'loadVideoFile'
+		}
+		var ext = file.substring(file.lastIndexOf('.') + 1);
+		var event = types[ext];
+		var data = this.current_path + '/' + file;
+		this.fn.ea.publish('react', {event_name: event, data: data});
+	}
+
 	selectFolder(index: number) {
 		var elem = $($('.icon-block[block-type="folder"]')[index]);
 		this.select_block(elem, index, 'folder');

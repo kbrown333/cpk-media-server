@@ -2,6 +2,7 @@ import {inject, bindable, bindingMode} from 'aurelia-framework';
 import {FnTs} from '../../../models/FnTs';
 
 @bindable({name: 'current_path', defaultValue: '/music'})
+@bindable({name: 'display_path', defaultValue: ''})
 @bindable({name: 'base_dir', defaultValue: {}})
 @bindable({name: 'ajax_path', defaultValue: '/files/files_list' })
 @inject(FnTs)
@@ -424,7 +425,12 @@ export class FilesPanel {
 		}
 		var ext = file.substring(file.lastIndexOf('.') + 1);
 		var event = types[ext];
-		var data = this.current_path + '/' + file;
+		var data = {
+				selected:  this.current_path + '/' + file,
+				all_files: this.visible_files,
+				path: this.current_path + '/',
+				original: file
+		};
 		this.fn.ea.publish('react', {event_name: event, data: data});
 	}
 

@@ -25,7 +25,8 @@
 						<i class="fa fa-table"></i>
 					</div>
 					<div style="display: inline-block;">
-						<h3 class="panel-title">${current_path}</h3>
+						<h3 if.bind="display_path == ''" class="panel-title">${current_path}</h3>
+                        <h3 if.bind="display_path != ''" class="panel-title">${display_path}</h3>
 					</div>
 					<div class="show_on_monitor" style="display: inline-block; float: right;">
 						<i class="fa fa-times panel-hdr-btn delete_btn" toggle-me.two-way="hdr_btns.select_all"

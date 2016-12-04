@@ -168,6 +168,19 @@ i.delete_btn {
     display: none;
 }
 
+#vid_player {
+    margin: 0 auto;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.fa-arrow-right, .fa-arrow-left {
+    cursor: pointer;
+}
+
 @media(min-width: 768px) {
     .show_on_monitor {
         display: block !important;

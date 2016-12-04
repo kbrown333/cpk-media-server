@@ -1,3 +1,42 @@
 <template>
-	
+    <require from="../../elements/aside"></require>
+    <require from="../../attributes/toggle-me"></require>
+    <require from="../files/partials/files-panel"></require>
+    <aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
+	<div toggle-me.two-way="visibility.panel" class="container host_container">
+		<files-panel base_dir.bind="dir" current_path="/videos" display_path="Video Files"></files-panel>
+	</div>
+	<div toggle-me.two-way="visibility.player" class="container host_container">
+        <div class="row">
+			<div class="col-xs-12">
+				<div class="panel panel-danger">
+					<div class="panel-heading">
+						<div style="display: inline-block; margin-right: 7px;">
+							<i class="fa fa-play"></i>
+						</div>
+						<div style="display: inline-block;">
+							<h3 class="panel-title">${now_playing}</h3>
+						</div>
+					</div>
+					<div class="panel-body">
+						<div class="row vertical-align" style="margin-left: 0px; margin-right: 0px;">
+							<div class="col-xs-1" style="margin-right: 10px;">
+								<i class="fa fa-2x fa-arrow-left" style="padding: 5px;" click.delegate="prev()"></i>
+							</div>
+							<div class="col-xs-10">
+								<div class="video_container">
+									<video id="vid_player" controls="true" class="img img-responsive">
+										<source id="vid_src" type="video/mp4">
+									</video>
+								</div>
+							</div>
+							<div class="col-xs-1" style="text-align: right;">
+								<i class="fa fa-2x fa-arrow-right" style="padding: 5px;" click.delegate="next()"></i>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
 </template>

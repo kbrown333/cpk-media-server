@@ -431,7 +431,12 @@ System.register(["aurelia-framework", "../../../models/FnTs"], function (exports
                     };
                     var ext = file.substring(file.lastIndexOf('.') + 1);
                     var event = types[ext];
-                    var data = this.current_path + '/' + file;
+                    var data = {
+                        selected: this.current_path + '/' + file,
+                        all_files: this.visible_files,
+                        path: this.current_path + '/',
+                        original: file
+                    };
                     this.fn.ea.publish('react', { event_name: event, data: data });
                 }
                 selectFolder(index) {
@@ -455,6 +460,7 @@ System.register(["aurelia-framework", "../../../models/FnTs"], function (exports
             };
             FilesPanel = __decorate([
                 aurelia_framework_1.bindable({ name: 'current_path', defaultValue: '/music' }),
+                aurelia_framework_1.bindable({ name: 'display_path', defaultValue: '' }),
                 aurelia_framework_1.bindable({ name: 'base_dir', defaultValue: {} }),
                 aurelia_framework_1.bindable({ name: 'ajax_path', defaultValue: '/files/files_list' }),
                 aurelia_framework_1.inject(FnTs_1.FnTs),

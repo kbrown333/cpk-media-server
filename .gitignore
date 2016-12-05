@@ -27,8 +27,6 @@ server/node_modules
 server/node_modules/*
 client/node_modules
 client/node_modules/*
-client/typings
-client/typings/*
 client/src/jspm_packages
 client/src/jspm_packages/*
 server/keys

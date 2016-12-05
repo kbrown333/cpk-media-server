@@ -181,6 +181,17 @@ i.delete_btn {
     cursor: pointer;
 }
 
+.mplayer-fix {
+    padding-right: 25px;
+}
+
+@media(max-width: 991px) {
+    .mplayer-fix {
+        margin-left: -12px;
+        padding-right: 6px;
+    }
+}
+
 @media(min-width: 768px) {
     .show_on_monitor {
         display: block !important;

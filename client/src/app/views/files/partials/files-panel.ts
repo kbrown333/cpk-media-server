@@ -400,7 +400,7 @@ export class FilesPanel {
 		else { height = size.height; width = size.width; }
 		var offset = width > 768 ? 150 : 190;
 		height = height - offset;
-		$(".panel-body").css('height', height + 'px');
+		$('.panel-body[panel-type="files-panel"]').css('height', height + 'px');
 	}
 
 	loadPage(page: string) {

@@ -37,9 +37,13 @@ export class Videos {
 	changeVideo = (link: string) => {
 		var player = <HTMLVideoElement>document.getElementById('vid_player');
 		var video = <HTMLVideoElement>document.getElementById('vid_src');
+		document.getElementById('vid_player').addEventListener('ended', () => {
+			this.next();
+		}, false)
 		player.pause();
 		video.src = link;
 		player.load();
+		player.play();
 	}
 
 	changeNowPlaying = (link: string) => {

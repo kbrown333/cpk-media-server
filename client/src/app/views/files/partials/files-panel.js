@@ -408,7 +408,7 @@ System.register(["aurelia-framework", "../../../models/FnTs"], function (exports
                     }
                     var offset = width > 768 ? 150 : 190;
                     height = height - offset;
-                    $(".panel-body").css('height', height + 'px');
+                    $('.panel-body[panel-type="files-panel"]').css('height', height + 'px');
                 }
                 loadPage(page) {
                     this.current_path = '/' + page;

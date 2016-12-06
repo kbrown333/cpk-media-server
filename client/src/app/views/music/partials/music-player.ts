@@ -7,6 +7,16 @@ export class MusicPlayer {
 
 	app_events: any;
 	now_playing: string = '[None Selected]';
+	player: any;
+	master_map: any;
+	master_list: any;
+	song_map: any;
+	song_list: any;
+	song_index: number;
+	shuffle_index: number;
+	continuous: boolean = true;
+	shuffle: boolean = false;
+	muted: boolean = false;
 
 	constructor (private fn: FnTs, private session: SessionData) {
 
@@ -17,25 +27,206 @@ export class MusicPlayer {
 		this.app_events = this.fn.ea.subscribe('react', (event: any) => {
 			if (this[event.event_name] != null) { this[event.event_name](event.data); }
 		});
+		this.initWaveSurfer()
+			.then(this.getMusicList)
+			.then(this.generateBindableList)
+			.then(this.loadMasterData)
+			.then(this.loadPlayer);
+		//force update of songe list on server
+		this.getSongMap();
 	}
 
 	detached() {
 		this.app_events.dispose();
 	}
 
+	initWaveSurfer(): Promise<any> {
+		//start a promise chain
+		//only runs once to avoid duplication
+		return new Promise((res) => {
+			res({
+				player: WaveSurfer.create({
+					container: '#waveform',
+		  			waveColor: 'red',
+		  			progressColor: 'purple',
+		  			height: 50,
+		  			hideScrollbar: true,
+		  			barWidth: 2
+				})
+			});
+		});
+	}
+
+	getMusicList = (data: any): Promise<any> => {
+		return new Promise((res) => {
+			var req = {
+				url: '/music/music_list'
+			}
+			var callback = (list: any) => {
+				data.map = list.data;
+				res(data);
+			}
+			this.fn.fn_Ajax(req)
+				.then(callback);
+		});
+	}
+
+	generateBindableList = (data: any) => {
+		var keys = Object.keys(data.map);
+		data.list = keys.map((val) => {
+			return data.map[val];
+		});
+		return data;
+	}
+
+	loadMasterData = (data: any) => {
+		this.player = data.player;
+		this.song_index = 0;
+		this.master_map = data.map;
+		this.master_list = data.list;
+		this.player.on("ready", () => {
+			//$("#waveform_loader").hide();
+			if (this.continuous) {
+				this.play();
+			}
+		});
+		this.player.on("finish", () => {
+			if (this.continuous) {
+				this.nextSong();
+			} else {
+				$("#play-btn").removeClass('icon_selected');
+			}
+		});
+		var slider = <any>document.querySelector('#slider');
+		slider.oninput = () => {
+		  	var vol = Number(slider.value) / 100;
+		  	this.player.setVolume(vol);
+		};
+		this.player.setVolume(.25);
+		return data;
+	}
+
+	getSongMap = (): void => {
+		var req = {
+			url: '/music/song_map'
+		}
+		this.fn.fn_Ajax(req)
+			.then((list) => { this.song_map = list.data; });
+	}
+
+	loadPlayer = (data: any, track: string = null) => {
+		this.song_map = data.map;
+		var start = track == null ? data.list[0] : track;
+		this.loadTrackList(data.list, start);
+	}
+
+	loadTrackList = (list: any, track: any) => {
+		this.song_list = list;
+		this.changeTrack(track);
+	}
+
+	changeTrack = (track: any) => {
+		this.player.load(track.path);
+		this.now_playing = track;
+	}
+
+	play = () => {
+		this.player.play();
+		$("#pause-btn").removeClass('icon_selected');
+		$("#play-btn").addClass('icon_selected');
+	}
+
+	pause = () => {
+		this.player.pause();
+		$("#pause-btn").addClass('icon_selected');
+		$("#play-btn").removeClass('icon_selected');
+	}
+
+	nextSong = () => {
+		if (this.song_index < this.song_list.length - 1) {
+			this.song_index++;
+			this.changeTrack(this.song_list[this.song_index]);
+		}
+	}
+
+	prevSong = () => {
+		if (this.song_index > 0) {
+			this.song_index--;
+			this.changeTrack(this.song_list[this.song_index]);
+		}
+	}
+
+	toggleContinuous = () => {
+		if (this.continuous) {
+			this.continuous = false;
+			$("#continue-btn").removeClass('icon_selected');
+		} else {
+			this.continuous = true;
+			$("#continue-btn").addClass('icon_selected');
+		}
+	}
+
+	toggleShuffle = () => {
+		if (this.shuffle) {
+			this.shuffle = false;
+			$("#shuffle-btn").removeClass('icon_selected');
+		} else {
+			this.shuffle = true;
+			$("#shuffle-btn").addClass('icon_selected');
+		}
+	}
+
+	toggleMute = () => {
+		if (this.muted) {
+			$("#vol-btn").removeClass('fa-volume-off');
+			$("#vol-btn").addClass('fa-volume-up');
+			$("#vol-btn").addClass('icon_selected');
+			this.muted = false;
+		} else {
+			$("#vol-btn").removeClass('fa-volume-up');
+			$("#vol-btn").addClass('fa-volume-off');
+			$("#vol-btn").removeClass('icon_selected');
+			this.muted = true;
+		}
+		this.player.toggleMute();
+	}
+
 	//Event Aggregator Functions
-	screenResize(size: any = null): void {
+	screenResize = (size: any = null): void => {
+		if (this.player != null) {
+			this.player.empty();
+			this.player.drawBuffer();
+		}
 		var height, width;
 		if (size == null) { height = $(window).height(); width = $(window).width(); }
 		else { height = size.height; width = size.width; }
 		var offset = width > 768 ? 150 : 190;
 		height = height - offset;
-		if (width > 991) $('.panel-body[panel-type="music-panel"]').css('height', height + 'px');
-		else $('.panel-body[panel-type="music-panel"]').css('height', '100px');
+		if (width > 767) $('.panel-body[panel-type="music-panel"]').css('height', height + 'px');
+		else {
+			$('.panel-body[panel-type="music-panel"]').css('height', '300px');
+			$('.panel-body[panel-type="files-panel"]').closest('.panel').css('margin-left', '5px');
+		}
 	}
 
 	loadMusicFile = (data: any) => {
-		var test = data;
+		var path_prefix = data.path.replace('/music/', 'content/tracks/')
+		var list = data.all_files.map((val) => {
+			return this.master_map[path_prefix + val];
+		});
+		var map = {}, index;
+		for (var i = 0; i < data.all_files.length; i++) {
+			map[path_prefix + data.all_files[i]] = this.master_map[path_prefix + data.all_files[i]];
+		}
+		for (var i = 0; i < list.length; i++) {
+			index = i;
+			if (list[i].path == data.selected.replace('/music/', 'content/tracks/')) {
+				break;
+			}
+		}
+		this.song_index = index;
+		var selected = map[data.selected.replace('/music/', 'content/tracks/')];
+		this.loadPlayer({map: map, list: list}, selected);
 	}
 
 }

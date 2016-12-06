@@ -44,13 +44,13 @@ System.register(["aurelia-framework", "../../models/FnTs", "../../models/session
                     this.changeVideo = (link) => {
                         var player = document.getElementById('vid_player');
                         var video = document.getElementById('vid_src');
-                        document.getElementById('vid_player').addEventListener('ended', () => {
-                            this.next();
-                        }, false);
                         player.pause();
                         video.src = link;
                         player.load();
                         player.play();
+                        document.getElementById('vid_player').addEventListener('ended', () => {
+                            setTimeout(() => { this.next(); }, 5000);
+                        }, false);
                     };
                     this.changeNowPlaying = (link) => {
                         var data = link.split('/');

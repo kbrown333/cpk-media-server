@@ -185,11 +185,65 @@ i.delete_btn {
     padding-right: 25px;
 }
 
+.wave-container {
+    width: 98%;
+    display: inline-block;
+    margin: 0 auto;
+    padding: 8px;
+    border: 1px solid purple;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.wave-footer {
+    width: 98%;
+    margin: 0 auto;
+    height: 40px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 1px solid purple;
+    background-color: purple;
+    display: inline-block;
+    border-top: none;
+    padding-top: 7px;
+}
+
+.wave-functions {
+    width: 98%;
+    margin: 0 auto;
+    height: 40px;
+    border-radius: 5px;
+    border: 1px solid purple;
+    background-color: purple;
+    display: inline-block;
+    border-top: none;
+    padding-top: 7px;
+}
+
+.wave-footer .col-xs-3,
+.wave-functions .col-xs-3,
+.wave-functions input {
+    text-align: center;
+    color: white;
+}
+
+.wave-footer .fa,
+.wave-functions .fa {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.now-playing {
+    margin-top: 5px;
+    color: white;
+}
+
+.icon_selected {
+    color: red !important;
+}
+
 @media(max-width: 991px) {
-    .mplayer-fix {
-        margin-left: -12px;
-        padding-right: 6px;
-    }
+
 }
 
 @media(min-width: 768px) {
@@ -222,6 +276,10 @@ i.delete_btn {
     .icon-block {
         max-width: 175px;
         margin: auto;
+    }
+    .mplayer-fix {
+        margin-left: -12px;
+        padding-right: 6px;
     }
 }
 @media(max-width: 450px) {

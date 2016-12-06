@@ -14,6 +14,7 @@
     <script type="text/javascript" src="app/javascript/jquery.js" />
 	<script type="text/javascript" src="app/javascript/bootstrap.min.js" />
     <script type="text/javascript" src="./app/javascript/jquery-ui.min.js" />
+    <script type="text/javascript" src="./app/javascript/wavesurfer.js" />
     <style>
         body {
             background-image: url(./app/images/pattern_40.gif);
@@ -24,6 +25,7 @@
     <script type="text/javascript" id="system_script"></script>
     <script type="text/javascript" id="config_script"></script>
     <script type="text/javascript" id="jqui_script"></script>
+    <script type="text/javascript" id="wave_script"></script>
     <div aurelia-app="main">
         <div class="splash">
             <div class="message">CPK Media Server</div>
@@ -40,6 +42,9 @@
                 });
                 $.getScript('app/javascript/jquery-ui.min.js', function(ui) {
                     $("#jqui_script").text(ui);
+                });
+                $.getScript('app/javascript/wavesurfer.js', function(wave) {
+                    $("#wave_script").text(wave);
                 });
             });
         </script>

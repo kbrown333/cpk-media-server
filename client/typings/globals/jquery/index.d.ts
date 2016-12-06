@@ -3224,4 +3224,4 @@ declare var $: JQueryStatic;
 interface WavesurferInterface {
     create(data: any): any;
 }
-declare var Wavesurfer: WavesurferInterface;
+declare var WaveSurfer: WavesurferInterface;

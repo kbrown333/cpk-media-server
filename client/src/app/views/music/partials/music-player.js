@@ -28,8 +28,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                 constructor(fn, session) {
                     this.fn = fn;
                     this.session = session;
-                    this.now_playing = '[None Selected]';
-                    this.continuous = true;
+                    this.continuous = false;
                     this.shuffle = false;
                     this.muted = false;
                     this.getMusicList = (data) => {
@@ -94,6 +93,10 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.song_list = list;
                         this.changeTrack(track);
                     };
+                    this.clickPlayTrack = (index, track) => {
+                        this.song_index = index;
+                        this.changeTrack(track);
+                    };
                     this.changeTrack = (track) => {
                         this.player.load(track.path);
                         this.now_playing = track;
@@ -108,16 +111,37 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         $("#pause-btn").addClass('icon_selected');
                         $("#play-btn").removeClass('icon_selected');
                     };
-                    this.nextSong = () => {
-                        if (this.song_index < this.song_list.length - 1) {
-                            this.song_index++;
-                            this.changeTrack(this.song_list[this.song_index]);
-                        }
-                    };
                     this.prevSong = () => {
                         if (this.song_index > 0) {
                             this.song_index--;
                             this.changeTrack(this.song_list[this.song_index]);
+                        }
+                    };
+                    this.nextSong = () => {
+                        if (this.shuffle) {
+                            this.randomSong();
+                        }
+                        else {
+                            if (this.song_index < this.song_list.length - 1) {
+                                this.song_index++;
+                                this.changeTrack(this.song_list[this.song_index]);
+                            }
+                        }
+                    };
+                    this.randomSong = () => {
+                        if (this.shuffle_list.length == this.shuffle_index) {
+                            this.song_index = 0;
+                            this.generateShuffle();
+                        }
+                        var track = this.shuffle_list[this.song_index];
+                        if (track.artist == this.now_playing.artist) {
+                            this.shuffle_index++;
+                            this.randomSong();
+                        }
+                        else {
+                            this.changeTrack(track);
+                            this.shuffle_history.push(track.path);
+                            this.shuffle_index++;
                         }
                     };
                     this.toggleContinuous = () => {
@@ -136,8 +160,10 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             $("#shuffle-btn").removeClass('icon_selected');
                         }
                         else {
-                            this.shuffle = true;
-                            $("#shuffle-btn").addClass('icon_selected');
+                            if (this.generateShuffle()) {
+                                this.shuffle = true;
+                                $("#shuffle-btn").addClass('icon_selected');
+                            }
                         }
                     };
                     this.toggleMute = () => {
@@ -154,6 +180,43 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             this.muted = true;
                         }
                         this.player.toggleMute();
+                    };
+                    this.generateShuffle = () => {
+                        var keys = Object.keys(this.song_map);
+                        var count = 0, a = [], tmp;
+                        var dist = {};
+                        while (keys.length > 0) {
+                            if (count % 2 == 0) {
+                                tmp = keys.shift();
+                            }
+                            else {
+                                tmp = keys.pop();
+                            }
+                            a.push(this.song_map[tmp]);
+                            if (dist[this.song_map[tmp].artist] == null) {
+                                dist[this.song_map[tmp].artist] = 1;
+                            }
+                            else {
+                                dist[this.song_map[tmp].artist]++;
+                            }
+                            count++;
+                        }
+                        var j, x, i;
+                        for (i = a.length; i; i--) {
+                            j = Math.floor(Math.random() * i);
+                            x = a[i - 1];
+                            a[i - 1] = a[j];
+                            a[j] = x;
+                        }
+                        this.shuffle_history = [];
+                        this.shuffle_index = 0;
+                        if (Object.keys(dist).length > 1) {
+                            this.shuffle_list = a;
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
                     };
                     this.screenResize = (size = null) => {
                         if (this.player != null) {

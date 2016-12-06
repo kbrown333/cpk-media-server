@@ -6,7 +6,7 @@ import {SessionData} from '../../../models/session';
 export class MusicPlayer {
 
 	app_events: any;
-	now_playing: string = '[None Selected]';
+	now_playing: any;
 	player: any;
 	master_map: any;
 	master_list: any;
@@ -14,7 +14,9 @@ export class MusicPlayer {
 	song_list: any;
 	song_index: number;
 	shuffle_index: number;
-	continuous: boolean = true;
+	shuffle_list: any;
+	shuffle_history: any;
+	continuous: boolean = false;
 	shuffle: boolean = false;
 	muted: boolean = false;
 
@@ -125,6 +127,11 @@ export class MusicPlayer {
 		this.changeTrack(track);
 	}
 
+	clickPlayTrack = (index: number, track: any) => {
+		this.song_index = index;
+		this.changeTrack(track);
+	}
+
 	changeTrack = (track: any) => {
 		this.player.load(track.path);
 		this.now_playing = track;
@@ -142,17 +149,37 @@ export class MusicPlayer {
 		$("#play-btn").removeClass('icon_selected');
 	}
 
-	nextSong = () => {
-		if (this.song_index < this.song_list.length - 1) {
-			this.song_index++;
-			this.changeTrack(this.song_list[this.song_index]);
-		}
-	}
-
 	prevSong = () => {
 		if (this.song_index > 0) {
 			this.song_index--;
 			this.changeTrack(this.song_list[this.song_index]);
+		}
+	}
+
+	nextSong = () => {
+		if (this.shuffle) {
+			this.randomSong();
+		} else {
+			if (this.song_index < this.song_list.length - 1) {
+				this.song_index++;
+				this.changeTrack(this.song_list[this.song_index]);
+			}
+		}
+	}
+
+	randomSong = () => {
+		if (this.shuffle_list.length == this.shuffle_index) {
+			this.song_index = 0;
+			this.generateShuffle();
+		}
+		var track = this.shuffle_list[this.song_index];
+		if (track.artist == this.now_playing.artist) {
+			this.shuffle_index++;
+			this.randomSong();
+		} else {
+			this.changeTrack(track);
+			this.shuffle_history.push(track.path);
+			this.shuffle_index++;
 		}
 	}
 
@@ -171,8 +198,10 @@ export class MusicPlayer {
 			this.shuffle = false;
 			$("#shuffle-btn").removeClass('icon_selected');
 		} else {
-			this.shuffle = true;
-			$("#shuffle-btn").addClass('icon_selected');
+			if (this.generateShuffle()) {
+				this.shuffle = true;
+				$("#shuffle-btn").addClass('icon_selected');
+			}
 		}
 	}
 
@@ -189,6 +218,43 @@ export class MusicPlayer {
 			this.muted = true;
 		}
 		this.player.toggleMute();
+	}
+
+	generateShuffle = (): boolean => {
+		var keys = Object.keys(this.song_map);
+		var count = 0, a = [], tmp;
+		var dist = {};
+		//preliminary shuffle
+		while (keys.length > 0) {
+			if (count % 2 == 0) {
+				tmp = keys.shift();
+			} else {
+				tmp = keys.pop();
+			}
+			a.push(this.song_map[tmp]);
+			if (dist[this.song_map[tmp].artist] == null) {
+				dist[this.song_map[tmp].artist] = 1;
+			} else {
+				dist[this.song_map[tmp].artist]++;
+			}
+			count++;
+		}
+		//random shuffle
+		var j, x, i;
+	    for (i = a.length; i; i--) {
+	        j = Math.floor(Math.random() * i);
+	        x = a[i - 1];
+	        a[i - 1] = a[j];
+	        a[j] = x;
+	    }
+	    this.shuffle_history = [];
+	    this.shuffle_index = 0;
+	    if (Object.keys(dist).length > 1) {
+	    	this.shuffle_list = a;
+	    	return true;
+	    } else {
+	    	return false;
+	    }
 	}
 
 	//Event Aggregator Functions

@@ -7,6 +7,7 @@ export class MusicPlayer {
 
 	app_events: any;
 	now_playing: any;
+	track_time: any;
 	player: any;
 	master_map: any;
 	master_list: any;
@@ -21,7 +22,10 @@ export class MusicPlayer {
 	muted: boolean = false;
 
 	constructor (private fn: FnTs, private session: SessionData) {
-
+		this.track_time = {
+			total: "0:00",
+			current: "0:00"
+		}
 	}
 
 	attached() {
@@ -40,6 +44,9 @@ export class MusicPlayer {
 
 	detached() {
 		this.app_events.dispose();
+		if (this.player != null) {
+			this.player.destroy();
+		}
 	}
 
 	initWaveSurfer(): Promise<any> {
@@ -88,6 +95,8 @@ export class MusicPlayer {
 		this.master_list = data.list;
 		this.player.on("ready", () => {
 			//$("#waveform_loader").hide();
+			this.track_time.current = "0:00";
+			this.track_time.total = this.secondsToMinutes(this.player.getDuration())
 			if (this.continuous) {
 				this.play();
 			}
@@ -97,6 +106,12 @@ export class MusicPlayer {
 				this.nextSong();
 			} else {
 				$("#play-btn").removeClass('icon_selected');
+			}
+		});
+		this.player.on("audioprocess", () => {
+			var time = this.player.backend.getCurrentTime();
+			if (time > 0) {
+				this.track_time.current = this.secondsToMinutes(time);
 			}
 		});
 		var slider = <any>document.querySelector('#slider');
@@ -120,11 +135,22 @@ export class MusicPlayer {
 		this.song_map = data.map;
 		var start = track == null ? data.list[0] : track;
 		this.loadTrackList(data.list, start);
+		this.resizeTrackList();
 	}
 
 	loadTrackList = (list: any, track: any) => {
 		this.song_list = list;
 		this.changeTrack(track);
+	}
+
+	resizeTrackList = () => {
+		setTimeout(() => {
+			var outer = $('.panel-body[panel-type="music-panel"]').height();
+			var inner = $('#music-panel').height();
+			var height = outer - inner - 40;
+			height = Math.max(height, 150);
+			$('.loaded_songs').css('max-height', height + "px");
+		}, 50);
 	}
 
 	clickPlayTrack = (index: number, track: any) => {
@@ -169,10 +195,10 @@ export class MusicPlayer {
 
 	randomSong = () => {
 		if (this.shuffle_list.length == this.shuffle_index) {
-			this.song_index = 0;
+			this.shuffle_index = 0;
 			this.generateShuffle();
 		}
-		var track = this.shuffle_list[this.song_index];
+		var track = this.shuffle_list[this.shuffle_index];
 		if (track.artist == this.now_playing.artist) {
 			this.shuffle_index++;
 			this.randomSong();
@@ -257,6 +283,24 @@ export class MusicPlayer {
 	    }
 	}
 
+	secondsToMinutes = (time: any) => {
+		// Minutes and seconds
+		var mins = ~~(time / 60);
+		var secs = time % 60;
+		// Hours, minutes and seconds
+		var hrs = ~~(time / 3600);
+		var mins = ~~((time % 3600) / 60);
+		var secs = time % 60;
+		// Output like "1:01" or "4:03:59" or "123:03:59"
+		var ret = "";
+		if (hrs > 0) {
+		    ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+		}
+		ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+		ret += "" + secs;
+		return ret.split('.')[0];
+	}
+
 	//Event Aggregator Functions
 	screenResize = (size: any = null): void => {
 		if (this.player != null) {
@@ -273,6 +317,7 @@ export class MusicPlayer {
 			$('.panel-body[panel-type="music-panel"]').css('height', '300px');
 			$('.panel-body[panel-type="files-panel"]').closest('.panel').css('margin-left', '5px');
 		}
+		this.resizeTrackList();
 	}
 
 	loadMusicFile = (data: any) => {
@@ -293,6 +338,15 @@ export class MusicPlayer {
 		this.song_index = index;
 		var selected = map[data.selected.replace('/music/', 'content/tracks/')];
 		this.loadPlayer({map: map, list: list}, selected);
+	}
+
+	loadAllTracks = () => {
+		this.shuffle_index = 0;
+		this.song_index = -1;
+		var data = this.generateBindableList({map: this.master_map});
+		this.song_map = data.map;
+		this.song_list = data.list;
+		this.fn.ea.publish('react', {event_name: 'toggle_aside'});
 	}
 
 }

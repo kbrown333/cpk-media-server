@@ -290,6 +290,17 @@ i.delete_btn {
     cursor: pointer;
 }
 
+.duration-bar {
+    width: 100%;
+    height: 20px;
+    margin-top: 5px;
+}
+
+#slider {
+    width: 70%;
+    margin: 0 auto;
+}
+
 @media(max-width: 991px) {
 
 }

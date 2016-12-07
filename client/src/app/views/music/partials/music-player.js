@@ -57,6 +57,8 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.master_map = data.map;
                         this.master_list = data.list;
                         this.player.on("ready", () => {
+                            this.track_time.current = "0:00";
+                            this.track_time.total = this.secondsToMinutes(this.player.getDuration());
                             if (this.continuous) {
                                 this.play();
                             }
@@ -67,6 +69,12 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             }
                             else {
                                 $("#play-btn").removeClass('icon_selected');
+                            }
+                        });
+                        this.player.on("audioprocess", () => {
+                            var time = this.player.backend.getCurrentTime();
+                            if (time > 0) {
+                                this.track_time.current = this.secondsToMinutes(time);
                             }
                         });
                         var slider = document.querySelector('#slider');
@@ -88,10 +96,20 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.song_map = data.map;
                         var start = track == null ? data.list[0] : track;
                         this.loadTrackList(data.list, start);
+                        this.resizeTrackList();
                     };
                     this.loadTrackList = (list, track) => {
                         this.song_list = list;
                         this.changeTrack(track);
+                    };
+                    this.resizeTrackList = () => {
+                        setTimeout(() => {
+                            var outer = $('.panel-body[panel-type="music-panel"]').height();
+                            var inner = $('#music-panel').height();
+                            var height = outer - inner - 40;
+                            height = Math.max(height, 150);
+                            $('.loaded_songs').css('max-height', height + "px");
+                        }, 50);
                     };
                     this.clickPlayTrack = (index, track) => {
                         this.song_index = index;
@@ -130,10 +148,10 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                     };
                     this.randomSong = () => {
                         if (this.shuffle_list.length == this.shuffle_index) {
-                            this.song_index = 0;
+                            this.shuffle_index = 0;
                             this.generateShuffle();
                         }
-                        var track = this.shuffle_list[this.song_index];
+                        var track = this.shuffle_list[this.shuffle_index];
                         if (track.artist == this.now_playing.artist) {
                             this.shuffle_index++;
                             this.randomSong();
@@ -218,6 +236,20 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             return false;
                         }
                     };
+                    this.secondsToMinutes = (time) => {
+                        var mins = ~~(time / 60);
+                        var secs = time % 60;
+                        var hrs = ~~(time / 3600);
+                        var mins = ~~((time % 3600) / 60);
+                        var secs = time % 60;
+                        var ret = "";
+                        if (hrs > 0) {
+                            ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+                        }
+                        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+                        ret += "" + secs;
+                        return ret.split('.')[0];
+                    };
                     this.screenResize = (size = null) => {
                         if (this.player != null) {
                             this.player.empty();
@@ -240,6 +272,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             $('.panel-body[panel-type="music-panel"]').css('height', '300px');
                             $('.panel-body[panel-type="files-panel"]').closest('.panel').css('margin-left', '5px');
                         }
+                        this.resizeTrackList();
                     };
                     this.loadMusicFile = (data) => {
                         var path_prefix = data.path.replace('/music/', 'content/tracks/');
@@ -260,6 +293,18 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         var selected = map[data.selected.replace('/music/', 'content/tracks/')];
                         this.loadPlayer({ map: map, list: list }, selected);
                     };
+                    this.loadAllTracks = () => {
+                        this.shuffle_index = 0;
+                        this.song_index = -1;
+                        var data = this.generateBindableList({ map: this.master_map });
+                        this.song_map = data.map;
+                        this.song_list = data.list;
+                        this.fn.ea.publish('react', { event_name: 'toggle_aside' });
+                    };
+                    this.track_time = {
+                        total: "0:00",
+                        current: "0:00"
+                    };
                 }
                 attached() {
                     this.screenResize();
@@ -277,6 +322,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                 }
                 detached() {
                     this.app_events.dispose();
+                    if (this.player != null) {
+                        this.player.destroy();
+                    }
                 }
                 initWaveSurfer() {
                     return new Promise((res) => {

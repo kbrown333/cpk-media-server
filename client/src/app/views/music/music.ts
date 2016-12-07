@@ -6,7 +6,9 @@ import {SessionData} from '../../models/session';
 export class Music {
 
 	app_events: any;
-	aside_links: any = [];
+	aside_links: any = [
+        {name: 'Load All Tracks', event: 'loadAllTracks'},
+	];
 	dir = {
 		music: {'_files_': []},
 	};

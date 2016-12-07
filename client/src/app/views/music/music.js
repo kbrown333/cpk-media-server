@@ -28,7 +28,9 @@ System.register(["aurelia-framework", "../../models/FnTs", "../../models/session
                 constructor(fn, session) {
                     this.fn = fn;
                     this.session = session;
-                    this.aside_links = [];
+                    this.aside_links = [
+                        { name: 'Load All Tracks', event: 'loadAllTracks' },
+                    ];
                     this.dir = {
                         music: { '_files_': [] },
                     };

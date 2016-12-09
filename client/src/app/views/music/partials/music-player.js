@@ -28,6 +28,8 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                 constructor(fn, session) {
                     this.fn = fn;
                     this.session = session;
+                    this.shuffle_passes = 2;
+                    this.shuffle_single = false;
                     this.continuous = false;
                     this.shuffle = false;
                     this.muted = false;
@@ -152,7 +154,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             this.generateShuffle();
                         }
                         var track = this.shuffle_list[this.shuffle_index];
-                        if (track.artist == this.now_playing.artist) {
+                        if (track.artist == this.now_playing.artist && !this.shuffle_single) {
                             this.shuffle_index++;
                             this.randomSong();
                         }
@@ -200,6 +202,21 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.player.toggleMute();
                     };
                     this.generateShuffle = () => {
+                        this.shuffle_single = false;
+                        var data = this.prelimShuffle();
+                        var list = data.obj;
+                        for (var i = 0; i < this.shuffle_passes; i++) {
+                            list = this.randomShuffle(list);
+                        }
+                        this.shuffle_history = [];
+                        this.shuffle_index = 0;
+                        this.shuffle_list = list;
+                        if (Object.keys(data.dist).length <= 1) {
+                            this.shuffle_single = true;
+                        }
+                        return true;
+                    };
+                    this.prelimShuffle = () => {
                         var keys = Object.keys(this.song_map);
                         var count = 0, a = [], tmp;
                         var dist = {};
@@ -219,6 +236,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             }
                             count++;
                         }
+                        return { obj: a, dist: dist };
+                    };
+                    this.randomShuffle = (a) => {
                         var j, x, i;
                         for (i = a.length; i; i--) {
                             j = Math.floor(Math.random() * i);
@@ -226,15 +246,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             a[i - 1] = a[j];
                             a[j] = x;
                         }
-                        this.shuffle_history = [];
-                        this.shuffle_index = 0;
-                        if (Object.keys(dist).length > 1) {
-                            this.shuffle_list = a;
-                            return true;
-                        }
-                        else {
-                            return false;
-                        }
+                        return a;
                     };
                     this.secondsToMinutes = (time) => {
                         var mins = ~~(time / 60);
@@ -292,6 +304,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.song_index = index;
                         var selected = map[data.selected.replace('/music/', 'content/tracks/')];
                         this.loadPlayer({ map: map, list: list }, selected);
+                        if (this.shuffle) {
+                            this.generateShuffle();
+                        }
                     };
                     this.loadAllTracks = () => {
                         this.shuffle_index = 0;
@@ -300,6 +315,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.song_map = data.map;
                         this.song_list = data.list;
                         this.fn.ea.publish('react', { event_name: 'toggle_aside' });
+                        if (this.shuffle) {
+                            this.generateShuffle();
+                        }
                     };
                     this.track_time = {
                         total: "0:00",

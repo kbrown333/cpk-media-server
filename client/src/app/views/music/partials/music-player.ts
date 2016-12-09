@@ -17,6 +17,8 @@ export class MusicPlayer {
 	shuffle_index: number;
 	shuffle_list: any;
 	shuffle_history: any;
+	shuffle_passes: number = 2;
+	shuffle_single: boolean = false;
 	continuous: boolean = false;
 	shuffle: boolean = false;
 	muted: boolean = false;
@@ -199,7 +201,7 @@ export class MusicPlayer {
 			this.generateShuffle();
 		}
 		var track = this.shuffle_list[this.shuffle_index];
-		if (track.artist == this.now_playing.artist) {
+		if (track.artist == this.now_playing.artist && !this.shuffle_single) {
 			this.shuffle_index++;
 			this.randomSong();
 		} else {
@@ -247,10 +249,25 @@ export class MusicPlayer {
 	}
 
 	generateShuffle = (): boolean => {
+		this.shuffle_single = false;
+		var data = this.prelimShuffle();
+		var list = data.obj;
+		for (var i = 0; i < this.shuffle_passes; i++) {
+			list = this.randomShuffle(list);
+		}
+	    this.shuffle_history = [];
+	    this.shuffle_index = 0;
+		this.shuffle_list = list;
+	    if (Object.keys(data.dist).length <= 1) {
+	    	this.shuffle_single = true;
+	    }
+		return true;
+	}
+
+	prelimShuffle = (): any => {
 		var keys = Object.keys(this.song_map);
 		var count = 0, a = [], tmp;
 		var dist = {};
-		//preliminary shuffle
 		while (keys.length > 0) {
 			if (count % 2 == 0) {
 				tmp = keys.shift();
@@ -265,7 +282,10 @@ export class MusicPlayer {
 			}
 			count++;
 		}
-		//random shuffle
+		return {obj: a, dist: dist};
+	}
+
+	randomShuffle = (a: any): any => {
 		var j, x, i;
 	    for (i = a.length; i; i--) {
 	        j = Math.floor(Math.random() * i);
@@ -273,14 +293,7 @@ export class MusicPlayer {
 	        a[i - 1] = a[j];
 	        a[j] = x;
 	    }
-	    this.shuffle_history = [];
-	    this.shuffle_index = 0;
-	    if (Object.keys(dist).length > 1) {
-	    	this.shuffle_list = a;
-	    	return true;
-	    } else {
-	    	return false;
-	    }
+		return a;
 	}
 
 	secondsToMinutes = (time: any) => {
@@ -338,6 +351,9 @@ export class MusicPlayer {
 		this.song_index = index;
 		var selected = map[data.selected.replace('/music/', 'content/tracks/')];
 		this.loadPlayer({map: map, list: list}, selected);
+		if (this.shuffle) {
+			this.generateShuffle();
+		}
 	}
 
 	loadAllTracks = () => {
@@ -347,6 +363,9 @@ export class MusicPlayer {
 		this.song_map = data.map;
 		this.song_list = data.list;
 		this.fn.ea.publish('react', {event_name: 'toggle_aside'});
+		if (this.shuffle) {
+			this.generateShuffle();
+		}
 	}
 
 }

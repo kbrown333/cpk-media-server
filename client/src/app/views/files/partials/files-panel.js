@@ -427,7 +427,11 @@ System.register(["aurelia-framework", "../../../models/FnTs"], function (exports
                 openFile(file) {
                     var types = {
                         'mp3': 'loadMusicFile',
-                        'mp4': 'loadVideoFile'
+                        'mp4': 'loadVideoFile',
+                        'jpeg': 'loadPictureFile',
+                        'jpg': 'loadPictureFile',
+                        'png': 'loadPictureFile',
+                        'gif': 'loadPictureFile'
                     };
                     var ext = file.substring(file.lastIndexOf('.') + 1);
                     var event = types[ext];

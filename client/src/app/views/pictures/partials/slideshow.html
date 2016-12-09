@@ -1,0 +1,50 @@
+<template>
+	<div class="row">
+		<div class="col-xs-12">
+			<div class="panel panel-danger">
+				<div class="panel-heading">
+					<div style="display: inline-block; margin-right: 7px;">
+						<i class="fa fa-play"></i>
+					</div>
+					<div style="display: inline-block;">
+						<h3 class="panel-title">${current_img}</h3>
+					</div>
+				</div>
+				<div class="panel-body show_on_monitor pic_panel" panel-type="pictures-panel">
+					<div class="row vertical-align" style="margin-left: 0px; margin-right: 0px;">
+						<div class="col-xs-2 slide_column" style="border-right: 1px solid #1f1c1c;">
+							<ul>
+								<li class="img_aside_container" repeat.for="pic of picture_list">
+									<img align="middle" class="img img-responsive" src.bind="pic"
+										click.delegate="selectImage($index)" />
+								</li>
+							</ul>
+						</div>
+						<div class="col-xs-1" style="margin-right: 10px; padding-left: 10px;">
+							<i class="fa fa-2x fa-arrow-left" style="padding: 5px;" click.delegate="prev()"></i>
+						</div>
+						<div class="col-xs-8 slide_column">
+							<img class="img img-responsive slide_poster" src.bind="current_img" />
+						</div>
+						<div class="col-xs-1" style="text-align: right;">
+							<i class="fa fa-2x fa-arrow-right" style="padding: 5px;" click.delegate="next()"></i>
+						</div>
+					</div>
+				</div>
+				<div class="panel-body show_on_mobile pic_panel" panel-type="pictures-panel">
+					<div class="row vertical-align" style="margin-left: 0px; margin-right: 0px;">
+						<div class="col-xs-1" style="margin-right: 10px;">
+							<i class="fa fa-2x fa-arrow-left" style="padding: 5px;" click.delegate="prev()"></i>
+						</div>
+						<div class="col-xs-10 slide_column">
+							<img class="img img-responsive slide_poster" src="/content/pictures/bt-kb-1.jpg" />
+						</div>
+						<div class="col-xs-1" style="text-align: right;">
+							<i class="fa fa-2x fa-arrow-right" style="padding: 5px;" click.delegate="next()"></i>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</template>

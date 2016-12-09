@@ -302,6 +302,46 @@ i.delete_btn {
     margin: 0 auto;
 }
 
+.slide_poster {
+    margin: auto;
+}
+
+.slide_column {
+    padding: 10px;
+}
+
+.pic_panel {
+    background-color: black;
+}
+
+.slide_column > ul {
+    list-style-type: none;
+    padding: 10px;
+    margin-bottom: 0px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.img_aside_container {
+    height: 80px;
+    width: 95%;
+    margin: auto;
+    display: flex;
+    vertical-align: middle;
+    border-bottom: 1px solid #5a4e4e;
+}
+
+.img_aside_container:first-of-type {
+    border-top: 1px solid #5a4e4e;
+}
+
+.img_aside_container > img {
+    display: block;
+    margin: 0 auto;
+    cursor: pointer;
+    padding: 5px 0px;
+}
+
 @media(max-width: 991px) {
 
 }

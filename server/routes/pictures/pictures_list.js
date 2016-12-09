@@ -4,7 +4,7 @@ var ls = require('list-directory-contents');
 var path = require('path');
 
 router.get('/', function(req, res) {
-	ls(path.join('../client/src/content/pics/'), function(err, tree) {
+	ls(path.join('../client/src/content/pictures/'), function(err, tree) {
 		if (err) {
 			res.status(200).send(err);
 		} else {

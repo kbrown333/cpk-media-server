@@ -1,3 +1,13 @@
 <template>
-	
+	<require from="../../elements/aside"></require>
+	<require from="../../attributes/toggle-me"></require>
+	<require from="../files/partials/files-panel"></require>
+	<require from="./partials/slideshow"></require>
+	<aside toggle-me.two-way="session.visibility.aside" aside_links.two-way="aside_links"></aside>
+	<div toggle-me.two-way="visibility.panel" class="container host_container">
+		<files-panel base_dir.bind="dir" current_path="/pictures" display_path="Pictures"></files-panel>
+	</div>
+	<div toggle-me.two-way="visibility.slideshow" class="container host_container">
+		<slideshow></slideshow>
+	</div>
 </template>

@@ -421,7 +421,11 @@ export class FilesPanel {
 	openFile(file: any) {
 		var types = {
 			'mp3': 'loadMusicFile',
-			'mp4': 'loadVideoFile'
+			'mp4': 'loadVideoFile',
+			'jpeg': 'loadPictureFile',
+			'jpg': 'loadPictureFile',
+			'png': 'loadPictureFile',
+			'gif': 'loadPictureFile'
 		}
 		var ext = file.substring(file.lastIndexOf('.') + 1);
 		var event = types[ext];

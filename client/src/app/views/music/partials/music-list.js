@@ -37,8 +37,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         playlists: { display: 'hide', header: 'Playlists' },
                         loaded_songs: { display: 'hide', header: 'Songs' },
                     };
+                    this.nav = { index: 0, list: null, list_index: 0 };
                     this.view_header = 'Select View';
-                    this.songs = [];
+                    this.master_list = [];
                     this.artists = [];
                     this.artist_index = {};
                     this.albums = [];
@@ -47,18 +48,57 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                     this.genre_index = {};
                     this.playlists = [];
                     this.loaded_songs = [];
-                    this.toggleSubList = (name) => {
-                        var keys = Object.keys(this.visibility);
-                        for (var i = 0; i < keys.length; i++) {
-                            this.visibility[keys[i]].display = 'hide';
+                    this.clickSubList = (name) => {
+                        this.nav.list = name;
+                        this.nav.index = 1;
+                        this.toggleSubList(name);
+                        if (name == 'songs') {
+                            this.loaded_songs = this.master_list;
                         }
-                        this.visibility[name].display = 'show';
-                        this.view_header = this.visibility[name].header;
+                    };
+                    this.toggleSubList = (name) => {
+                        if (name != null) {
+                            var keys = Object.keys(this.visibility);
+                            for (var i = 0; i < keys.length; i++) {
+                                this.visibility[keys[i]].display = 'hide';
+                            }
+                            this.visibility[name].display = 'show';
+                            this.view_header = this.visibility[name].header;
+                        }
+                    };
+                    this.clickBack = () => {
+                        switch (this.nav.index) {
+                            case 1: {
+                                this.toggleSubList('main');
+                                this.nav.index--;
+                                break;
+                            }
+                            case 2: {
+                                this.toggleSubList(this.nav.list);
+                                this.nav.index--;
+                                break;
+                            }
+                        }
+                    };
+                    this.clickForward = () => {
+                        switch (this.nav.index) {
+                            case 0: {
+                                if (this.nav.list != null) {
+                                    this.nav.index++;
+                                    this.toggleSubList(this.nav.list);
+                                }
+                                break;
+                            }
+                            case 1: {
+                                this.toggleSubList('loaded_songs');
+                                this.nav.index++;
+                                break;
+                            }
+                        }
                     };
                     this.loadBindableData = (data) => {
                         this.clearLists();
                         this.clearIndexes();
-                        this.songs = data;
                         for (var i = 0; i < data.length; i++) {
                             this.loadByType(data[i], 'artist', 'artists', 'artist_index');
                             this.loadByType(data[i], 'album', 'albums', 'album_index');
@@ -96,7 +136,39 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         }
                         this[ti][index]['array'].push(data);
                     };
+                    this.loadSubGroup = (item, index) => {
+                        this.nav.list_index = index;
+                        this.nav.index = 2;
+                        this.loaded_songs = item.array;
+                        this.toggleSubList('loaded_songs');
+                    };
+                    this.sendListToPlayer = (item) => {
+                        var path = item.path.replace('content/tracks', '/music');
+                        var split = path.lastIndexOf('/') + 1;
+                        var current = path.substring(0, split);
+                        var file = path.substring(split);
+                        var all_files = this.loaded_songs.map((val) => {
+                            return val.path;
+                        });
+                        var data = {
+                            selected: path,
+                            path: current,
+                            original: file,
+                            all_files: all_files
+                        };
+                        this.fn.ea.publish('react', { event_name: 'loadPlayerFromList', data: data });
+                    };
                     this.screenResize = (size = null) => {
+                        this.resizeCategoryLists();
+                    };
+                    this.resizeCategoryLists = () => {
+                        setTimeout(() => {
+                            var outer = $('.panel-body[panel-type="music-panel"]').height();
+                            var inner = $('.list-view-header').height();
+                            var height = outer - inner - 40;
+                            height = Math.max(height, 150);
+                            $('.category-list').css('max-height', height + "px");
+                        }, 50);
                     };
                 }
                 attached() {
@@ -111,6 +183,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                 }
                 grid_dataChanged(newVal, oldVal) {
                     if (newVal != null) {
+                        this.master_list = newVal;
                         this.loadBindableData(newVal);
                     }
                 }

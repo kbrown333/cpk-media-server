@@ -15,10 +15,11 @@ export class MusicList {
 		genres: {display: 'hide', header: 'Genres'},
 		playlists: {display: 'hide', header: 'Playlists'},
 		loaded_songs: {display: 'hide', header: 'Songs'},
-	}
-	view_header: string = 'Select View'
+	};
+	nav: any = {index: 0, list: null, list_index: 0};
+	view_header: string = 'Select View';
 	grid_data: any;
-	songs: any = [];
+	master_list: any = [];
 	artists: any = [];
 	artist_index: any = {};
 	albums: any = [];
@@ -44,23 +45,64 @@ export class MusicList {
 
 	grid_dataChanged(newVal: any, oldVal: any) {
 		if (newVal != null) {
+			this.master_list = newVal;
 			this.loadBindableData(newVal);
 		}
 	}
 
+	clickSubList = (name: string) => {
+		this.nav.list = name;
+		this.nav.index = 1;
+		this.toggleSubList(name);
+		if (name == 'songs') { this.loaded_songs = this.master_list; }
+	}
+
 	toggleSubList = (name: string) => {
-		var keys = Object.keys(this.visibility);
-		for (var i = 0; i < keys.length; i++) {
-			this.visibility[keys[i]].display = 'hide';
+		if (name != null) {
+			var keys = Object.keys(this.visibility);
+			for (var i = 0; i < keys.length; i++) {
+				this.visibility[keys[i]].display = 'hide';
+			}
+			this.visibility[name].display = 'show';
+			this.view_header = this.visibility[name].header;
 		}
-		this.visibility[name].display = 'show';
-		this.view_header = this.visibility[name].header;
+	}
+
+	clickBack = () => {
+		switch(this.nav.index) {
+			case 1: {
+				this.toggleSubList('main');
+				this.nav.index--;
+				break;
+			}
+			case 2: {
+				this.toggleSubList(this.nav.list);
+				this.nav.index--;
+				break;
+			}
+		}
+	}
+
+	clickForward = () => {
+		switch(this.nav.index) {
+			case 0: {
+				if (this.nav.list != null) {
+					this.nav.index++;
+					this.toggleSubList(this.nav.list);
+				}
+				break;
+			}
+			case 1: {
+				this.toggleSubList('loaded_songs');
+				this.nav.index++;
+				break;
+			}
+		}
 	}
 
 	loadBindableData = (data: any) => {
 		this.clearLists();
 		this.clearIndexes();
-		this.songs = data;
 		for (var i = 0; i < data.length; i++) {
 			this.loadByType(data[i], 'artist', 'artists', 'artist_index');
 			this.loadByType(data[i], 'album', 'albums', 'album_index');
@@ -100,9 +142,43 @@ export class MusicList {
 		this[ti][index]['array'].push(data);
 	}
 
+	loadSubGroup = (item: any, index: number) => {
+		this.nav.list_index = index;
+		this.nav.index = 2;
+		this.loaded_songs = item.array;
+		this.toggleSubList('loaded_songs');
+	}
+
+	sendListToPlayer = (item: any) => {
+		var path = item.path.replace('content/tracks', '/music');
+		var split = path.lastIndexOf('/') + 1;
+		var current = path.substring(0, split);
+		var file = path.substring(split);
+		var all_files = this.loaded_songs.map((val) => {
+			return val.path;
+		})
+		var data = {
+			selected: path,
+			path: current,
+			original: file,
+			all_files: all_files
+		};
+		this.fn.ea.publish('react', {event_name: 'loadPlayerFromList', data: data});
+	}
+
 	//Event Aggregator Functions
 	screenResize = (size: any = null): void => {
+		this.resizeCategoryLists();
+	}
 
+	resizeCategoryLists = () => {
+		setTimeout(() => {
+			var outer = $('.panel-body[panel-type="music-panel"]').height();
+			var inner = $('.list-view-header').height();
+			var height = outer - inner - 40;
+			height = Math.max(height, 150);
+			$('.category-list').css('max-height', height + "px");
+		}, 50);
 	}
 
 }

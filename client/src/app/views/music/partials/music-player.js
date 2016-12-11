@@ -41,6 +41,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         if (this.visibility.player == 'show') {
                             this.visibility.player = 'hide';
                             this.visibility.list = 'show';
+                            this.fn.ea.publish('react', { event_name: 'resizeCategoryLists' });
                             $('#btn-list-view').addClass('list-view-selected');
                         }
                         else {
@@ -313,6 +314,30 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         var map = {}, index;
                         for (var i = 0; i < data.all_files.length; i++) {
                             map[path_prefix + data.all_files[i]] = this.master_map[path_prefix + data.all_files[i]];
+                        }
+                        for (var i = 0; i < list.length; i++) {
+                            index = i;
+                            if (list[i].path == data.selected.replace('/music/', 'content/tracks/')) {
+                                break;
+                            }
+                        }
+                        this.song_index = index;
+                        var selected = map[data.selected.replace('/music/', 'content/tracks/')];
+                        this.loadPlayer({ map: map, list: list }, selected);
+                        if (this.shuffle) {
+                            this.generateShuffle();
+                        }
+                    };
+                    this.loadPlayerFromList = (data) => {
+                        if (this.visibility.player != "show") {
+                            this.toggleListView();
+                        }
+                        var list = data.all_files.map((val) => {
+                            return this.master_map[val];
+                        });
+                        var map = {}, index;
+                        for (var i = 0; i < data.all_files.length; i++) {
+                            map[data.all_files[i]] = this.master_map[data.all_files[i]];
                         }
                         for (var i = 0; i < list.length; i++) {
                             index = i;

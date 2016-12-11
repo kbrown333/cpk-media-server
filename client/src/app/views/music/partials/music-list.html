@@ -2,40 +2,73 @@
     <require from="../../../attributes/toggle-me"></require>
 	<div class="list-view-header">
 		<div class="list-dir-buttons">
-			<i class="fa fa-arrow-left fa-2x" style="margin-top: 3px;"></i>
+			<i click.delegate="clickBack()" class="fa fa-arrow-left fa-2x" style="margin-top: 3px;"></i>
 		</div>
 		<div class="list-selected-panel">
 			<span>${view_header}</span>
 		</div>
 		<div class="list-dir-buttons">
-			<i class="fa fa-arrow-right fa-2x" style="margin-top: 3px;"></i>
+			<i click.delegate="clickForward()" class="fa fa-arrow-right fa-2x" style="margin-top: 3px;"></i>
 		</div>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.main.display">
 		<ul id="list-view-selection">
-			<li click.delegate="toggleSubList('songs')"><i class="fa fa-music"></i>All Songs</li>
-			<li click.delegate="toggleSubList('artists')"><i class="fa fa-user"></i>Artists</li>
-			<li click.delegate="toggleSubList('albums')"><i class="fa fa-users"></i>Albums</li>
-			<li click.delegate="toggleSubList('genres')"><i class="fa fa-th-list"></i>Genres</li>
-			<li click.delegate="toggleSubList('playlists')"><i class="fa fa-book"></i>Playlists</li>
+			<li click.delegate="clickSubList('songs')"><i class="fa fa-music"></i>All Songs</li>
+			<li click.delegate="clickSubList('artists')"><i class="fa fa-user"></i>Artists</li>
+			<li click.delegate="clickSubList('albums')"><i class="fa fa-users"></i>Albums</li>
+			<li click.delegate="clickSubList('genres')"><i class="fa fa-th-list"></i>Genres</li>
+			<li click.delegate="clickSubList('playlists')"><i class="fa fa-book"></i>Playlists</li>
 		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.songs.display">
-
+		<ul class="category-list">
+			<li repeat.for="item of master_list" click.delegate="sendListToPlayer(item)">
+				<p>${item.title}</p>
+				<p>${item.artist}</p>
+			</li>
+		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.artists.display">
-
+		<ul class="category-list">
+			<li repeat.for="item of artists" if.bind="item.name != 'Unknown' || item.array.length > 0">
+				<div class="group-container" click.delegate="loadSubGroup(item, $index)">
+					<p>${item.name}</p>
+					<p>Count: ${item.array.length}</p>
+				</div>
+			</li>
+		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.albums.display">
-
+		<ul class="category-list">
+			<li repeat.for="item of albums" if.bind="item.name != 'Unknown' || item.array.length > 0">
+				<div class="group-container" click.delegate="loadSubGroup(item, $index)">
+					<p>${item.name}</p>
+					<p>Count: ${item.array.length}</p>
+				</div>
+			</li>
+		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.genres.display">
-
+		<ul class="category-list">
+			<li repeat.for="item of genres" if.bind="item.name != 'Unknown' || item.array.length > 0">
+				<div class="group-container" click.delegate="loadSubGroup(item, $index)">
+					<p>${item.name}</p>
+					<p>Count: ${item.array.length}</p>
+				</div>
+			</li>
+		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.playlists.display">
 
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.loaded_songs.display">
-
+		<ul class="category-list">
+			<li repeat.for="item of loaded_songs">
+				<div class="group-container" click.delegate="sendListToPlayer(item)">
+					<p>${item.title}</p>
+					<p>${item.artist}</p>
+				</div>
+			</li>
+		</ul>
 	</div>
 </template>

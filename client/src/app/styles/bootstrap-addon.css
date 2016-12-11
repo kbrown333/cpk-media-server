@@ -384,6 +384,7 @@ i.delete_btn {
     list-style-type: none;
     padding: 5px;
     color: white;
+    overflow: auto;
 }
 
 .list-view-panel #list-view-selection li {
@@ -391,6 +392,28 @@ i.delete_btn {
     height: 50px;
     font-size: 15px;
     padding-top: 15px;
+}
+
+.list-view-panel .category-list li {
+    height: 53px;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.category-list li p {
+    margin: 0 0 5px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.category-list li p:last-of-type {
+    font-size: 13px;
+    color: #d0c6c6
+}
+
+.category-list .group-container {
+    display: inline-block;
+    width: 100%;
 }
 
 .list-view-panel ul li {

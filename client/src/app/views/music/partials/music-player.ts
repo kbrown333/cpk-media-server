@@ -6,6 +6,10 @@ import {SessionData} from '../../../models/session';
 export class MusicPlayer {
 
 	app_events: any;
+	visibility: any = {
+		player: 'show',
+		list: 'hide'
+	};
 	now_playing: any;
 	track_time: any;
 	player: any;
@@ -48,6 +52,18 @@ export class MusicPlayer {
 		this.app_events.dispose();
 		if (this.player != null) {
 			this.player.destroy();
+		}
+	}
+
+	toggleListView = () => {
+		if (this.visibility.player == 'show') {
+			this.visibility.player = 'hide';
+			this.visibility.list = 'show';
+			$('#btn-list-view').addClass('list-view-selected');
+		} else {
+			this.visibility.player = 'show';
+			this.visibility.list = 'hide';
+			$('#btn-list-view').removeClass('list-view-selected');
 		}
 	}
 
@@ -334,6 +350,7 @@ export class MusicPlayer {
 	}
 
 	loadMusicFile = (data: any) => {
+		if (this.visibility.player != "show") { this.toggleListView(); }
 		var path_prefix = data.path.replace('/music/', 'content/tracks/')
 		var list = data.all_files.map((val) => {
 			return this.master_map[path_prefix + val];

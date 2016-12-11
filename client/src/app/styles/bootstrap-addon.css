@@ -342,6 +342,70 @@ i.delete_btn {
     padding: 5px 0px;
 }
 
+.list-view-selected {
+    border: 1px solid purple;
+    background-color: purple;
+}
+
+.list-view-header {
+    height: 50px;
+    width: 100%;
+    padding: 2px 5px;
+    display: flex;
+}
+
+.list-dir-buttons {
+    display: inline-block;
+    width: 46px;
+    height: 100%;
+}
+
+.list-dir-buttons:last-of-type {
+    text-align: right;
+}
+
+.list-selected-panel {
+    display: inline-block;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    padding-top: 4px;
+    font-family: 'Comfortaa', cursive;
+    font-size: 16px;
+    color: white;
+}
+
+.list-view-panel {
+    width: 100%;
+    display: inline;
+}
+
+.list-view-panel > ul {
+    list-style-type: none;
+    padding: 5px;
+    color: white;
+}
+
+.list-view-panel #list-view-selection li {
+    /*text-align: center;*/
+    height: 50px;
+    font-size: 15px;
+    padding-top: 15px;
+}
+
+.list-view-panel ul li {
+    background-color: #2b2626;
+    cursor: pointer;
+}
+
+.list-view-panel ul li:nth-of-type(odd) {
+    background-color: #211e1e;
+}
+
+.list-view-panel ul li i {
+    margin: 0px 10px;
+}
+
 @media(max-width: 991px) {
 
 }

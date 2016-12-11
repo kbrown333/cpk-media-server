@@ -28,11 +28,27 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                 constructor(fn, session) {
                     this.fn = fn;
                     this.session = session;
+                    this.visibility = {
+                        player: 'show',
+                        list: 'hide'
+                    };
                     this.shuffle_passes = 2;
                     this.shuffle_single = false;
                     this.continuous = false;
                     this.shuffle = false;
                     this.muted = false;
+                    this.toggleListView = () => {
+                        if (this.visibility.player == 'show') {
+                            this.visibility.player = 'hide';
+                            this.visibility.list = 'show';
+                            $('#btn-list-view').addClass('list-view-selected');
+                        }
+                        else {
+                            this.visibility.player = 'show';
+                            this.visibility.list = 'hide';
+                            $('#btn-list-view').removeClass('list-view-selected');
+                        }
+                    };
                     this.getMusicList = (data) => {
                         return new Promise((res) => {
                             var req = {
@@ -287,6 +303,9 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.resizeTrackList();
                     };
                     this.loadMusicFile = (data) => {
+                        if (this.visibility.player != "show") {
+                            this.toggleListView();
+                        }
                         var path_prefix = data.path.replace('/music/', 'content/tracks/');
                         var list = data.all_files.map((val) => {
                             return this.master_map[path_prefix + val];

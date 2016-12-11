@@ -3,12 +3,14 @@ import {FnTs} from '../models/FnTs';
 
 @bindable({ name: 'modal', defaultValue: 'na' })
 @bindable({ name: 'view', defaultValue: 'na' })
+@bindable({ name: 'width', defaultValue: '' })
 @inject(FnTs)
 export class CpkModal {
 
 	//element bindings
 	view: string;
 	modal: string;
+	width: number;
 	//properties
 	guid: string;
 	app_events: any;

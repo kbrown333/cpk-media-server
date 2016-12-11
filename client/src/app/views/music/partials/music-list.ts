@@ -14,9 +14,10 @@ export class MusicList {
 		albums: {display: 'hide', header: 'Albums'},
 		genres: {display: 'hide', header: 'Genres'},
 		playlists: {display: 'hide', header: 'Playlists'},
+		open_playlist: {display: 'hide', header: ''},
 		loaded_songs: {display: 'hide', header: 'Songs'},
 	};
-	nav: any = {index: 0, list: null, list_index: 0};
+	nav: any = {index: 0, list: null, playlist: false};
 	view_header: string = 'Select View';
 	grid_data: any;
 	master_list: any = [];
@@ -27,10 +28,12 @@ export class MusicList {
 	genres: any = [];
 	genre_index: any = {};
 	playlists: any = [];
+	loaded_playlist: any = [];
 	loaded_songs: any = [];
 
 	constructor(private fn: FnTs, private session: SessionData) {
-
+		this.fn.fn_Ajax({ url: '/music/playlists' })
+			.then((data) => { this.playlists = data; });
 	}
 
 	attached() {
@@ -93,7 +96,11 @@ export class MusicList {
 				break;
 			}
 			case 1: {
-				this.toggleSubList('loaded_songs');
+				if (this.nav.playlist) {
+					this.toggleSubList('open_playlist');
+				} else {
+					this.toggleSubList('loaded_songs');
+				}
 				this.nav.index++;
 				break;
 			}
@@ -143,7 +150,7 @@ export class MusicList {
 	}
 
 	loadSubGroup = (item: any, index: number) => {
-		this.nav.list_index = index;
+		this.nav.playlist = false;
 		this.nav.index = 2;
 		this.loaded_songs = item.array;
 		this.toggleSubList('loaded_songs');
@@ -166,6 +173,40 @@ export class MusicList {
 		this.fn.ea.publish('react', {event_name: 'loadPlayerFromList', data: data});
 	}
 
+	clickAddPlaylist = () => {
+		this.fn.ea.publish('react', {
+			event_name: 'showModal',
+			data: {
+				modal: 'add_playlist',
+				content: {
+					title: 'Add Playlist',
+					name: ''
+				}
+			}
+		});
+	}
+
+	addPlaylist = (name: any) => {
+		var req = {
+			url: '/music/playlists',
+			type: 'POST',
+			data: {playlist: name}
+		}
+		this.fn.fn_Ajax(req)
+			.then((data) => {
+				this.playlists.push({name: name, tracks: []})
+			});
+	}
+
+	selectPlaylist = (index: number) => {
+		this.loaded_playlist = this.playlists[index].tracks;
+		this.visibility.open_playlist.header = this.playlists[index].name;
+		this.loaded_songs = this.playlists[index].tracks;
+		this.nav.index = 2;
+		this.nav.playlist = true;
+		this.toggleSubList('open_playlist');
+	}
+
 	//Event Aggregator Functions
 	screenResize = (size: any = null): void => {
 		this.resizeCategoryLists();
@@ -175,10 +216,19 @@ export class MusicList {
 		setTimeout(() => {
 			var outer = $('.panel-body[panel-type="music-panel"]').height();
 			var inner = $('.list-view-header').height();
-			var height = outer - inner - 40;
+			var height = outer - inner - 20;
 			height = Math.max(height, 150);
 			$('.category-list').css('max-height', height + "px");
+			$('.playlist-data').css('max-height', (height - 40) + "px");
 		}, 50);
+	}
+
+	onModalClose = (data: any) => {
+		switch (data.modal) {
+			case 'add_playlist':
+				this.addPlaylist(data.content.name);
+				break;
+		}
 	}
 
 }

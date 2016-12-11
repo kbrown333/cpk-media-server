@@ -35,9 +35,10 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         albums: { display: 'hide', header: 'Albums' },
                         genres: { display: 'hide', header: 'Genres' },
                         playlists: { display: 'hide', header: 'Playlists' },
+                        open_playlist: { display: 'hide', header: '' },
                         loaded_songs: { display: 'hide', header: 'Songs' },
                     };
-                    this.nav = { index: 0, list: null, list_index: 0 };
+                    this.nav = { index: 0, list: null, playlist: false };
                     this.view_header = 'Select View';
                     this.master_list = [];
                     this.artists = [];
@@ -47,6 +48,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                     this.genres = [];
                     this.genre_index = {};
                     this.playlists = [];
+                    this.loaded_playlist = [];
                     this.loaded_songs = [];
                     this.clickSubList = (name) => {
                         this.nav.list = name;
@@ -90,7 +92,12 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                                 break;
                             }
                             case 1: {
-                                this.toggleSubList('loaded_songs');
+                                if (this.nav.playlist) {
+                                    this.toggleSubList('open_playlist');
+                                }
+                                else {
+                                    this.toggleSubList('loaded_songs');
+                                }
                                 this.nav.index++;
                                 break;
                             }
@@ -137,7 +144,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this[ti][index]['array'].push(data);
                     };
                     this.loadSubGroup = (item, index) => {
-                        this.nav.list_index = index;
+                        this.nav.playlist = false;
                         this.nav.index = 2;
                         this.loaded_songs = item.array;
                         this.toggleSubList('loaded_songs');
@@ -158,6 +165,37 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         };
                         this.fn.ea.publish('react', { event_name: 'loadPlayerFromList', data: data });
                     };
+                    this.clickAddPlaylist = () => {
+                        this.fn.ea.publish('react', {
+                            event_name: 'showModal',
+                            data: {
+                                modal: 'add_playlist',
+                                content: {
+                                    title: 'Add Playlist',
+                                    name: ''
+                                }
+                            }
+                        });
+                    };
+                    this.addPlaylist = (name) => {
+                        var req = {
+                            url: '/music/playlists',
+                            type: 'POST',
+                            data: { playlist: name }
+                        };
+                        this.fn.fn_Ajax(req)
+                            .then((data) => {
+                            this.playlists.push({ name: name, tracks: [] });
+                        });
+                    };
+                    this.selectPlaylist = (index) => {
+                        this.loaded_playlist = this.playlists[index].tracks;
+                        this.visibility.open_playlist.header = this.playlists[index].name;
+                        this.loaded_songs = this.playlists[index].tracks;
+                        this.nav.index = 2;
+                        this.nav.playlist = true;
+                        this.toggleSubList('open_playlist');
+                    };
                     this.screenResize = (size = null) => {
                         this.resizeCategoryLists();
                     };
@@ -165,11 +203,21 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         setTimeout(() => {
                             var outer = $('.panel-body[panel-type="music-panel"]').height();
                             var inner = $('.list-view-header').height();
-                            var height = outer - inner - 40;
+                            var height = outer - inner - 20;
                             height = Math.max(height, 150);
                             $('.category-list').css('max-height', height + "px");
+                            $('.playlist-data').css('max-height', (height - 40) + "px");
                         }, 50);
                     };
+                    this.onModalClose = (data) => {
+                        switch (data.modal) {
+                            case 'add_playlist':
+                                this.addPlaylist(data.content.name);
+                                break;
+                        }
+                    };
+                    this.fn.fn_Ajax({ url: '/music/playlists' })
+                        .then((data) => { this.playlists = data; });
                 }
                 attached() {
                     this.app_events = this.fn.ea.subscribe('react', (event) => {

@@ -1,5 +1,9 @@
 <template>
     <require from="../../../attributes/toggle-me"></require>
+    <require from="../../../attributes/dbl-click"></require>
+    <require from="../../../attributes/one-click"></require>
+    <require from="../../../elements/cpk-modal"></require>
+    <cpk-modal modal="add_playlist" view="./modal/add-playlist" width="width: 80%;"></cpk-modal>
 	<div class="list-view-header">
 		<div class="list-dir-buttons">
 			<i click.delegate="clickBack()" class="fa fa-arrow-left fa-2x" style="margin-top: 3px;"></i>
@@ -59,7 +63,40 @@
 		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.playlists.display">
-
+		<ul class="category-list playlist-buttons">
+			<li class="playlist-header">
+				<div class="pull-right">
+					<i class="fa fa-times"></i>
+					<i class="fa fa-plus" click.delegate="clickAddPlaylist()"></i>
+				</div>
+			</li>
+		</ul>
+		<ul class="category-list playlist-data">
+			<li repeat.for="item of playlists">
+				<div class="group-container" dbl-click="event.bind: 'selectPlaylist'; data.bind: $index;">
+					<p>${item.name}</p>
+					<p>Count: ${item.tracks.length}</p>
+				</div>
+			</li>
+		</ul>
+	</div>
+	<div class="list-view-panel" toggle-me.two-way="visibility.open_playlist.display">
+		<ul class="category-list playlist-buttons">
+			<li class="playlist-header">
+				<div class="pull-right">
+					<i class="fa fa-times"></i>
+					<i class="fa fa-plus" click.delegate="clickAddTrackToPlaylist()"></i>
+				</div>
+			</li>
+		</ul>
+		<ul class="category-list playlist-data">
+			<li repeat.for="item of loaded_playlist">
+				<div class="group-container" click.delegate="sendListToPlayer(item)">
+					<p>${item.title}</p>
+					<p>${item.artist}</p>
+				</div>
+			</li>
+		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.loaded_songs.display">
 		<ul class="category-list">

@@ -34,6 +34,7 @@ var delete_files = require('./routes/files/delete_files');
 var download_files = require('./routes/files/download_files');
 var pictures_list = require('./routes/pictures/pictures_list');
 var music_list = require('./routes/music/music_list');
+var playlists = require('./routes/music/playlists');
 var youtube = require('./routes/music/youtube');
 var song_map = require('./routes/music/song_map');
 
@@ -50,6 +51,7 @@ app.use('/files/delete_files', delete_files);
 app.use('/files/download_files', download_files);
 app.use('/pictures/pictures_list', pictures_list);
 app.use('/music/music_list', music_list);
+app.use('/music/playlists', playlists);
 app.use('/music/youtube', youtube);
 app.use('/music/song_map', song_map);
 
@@ -101,6 +103,7 @@ global.fs_root_dir = path.join(String(__dirname)).replace('/server', '/client/pr
 var jsondb = require('node-json-db');
 global.jsdb = {};
 global.jsdb.music = new jsondb('db_music', true, false);
+global.jsdb.playlists = new jsondb('db_playlists', true, false);
 
 require('./controllers/song_map').get_data(function() {
     console.log('songs have been mapped');

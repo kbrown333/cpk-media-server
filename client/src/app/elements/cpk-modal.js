@@ -63,6 +63,7 @@ System.register(["aurelia-framework", "../models/FnTs"], function (exports_1, co
             CpkModal = __decorate([
                 aurelia_framework_1.bindable({ name: 'modal', defaultValue: 'na' }),
                 aurelia_framework_1.bindable({ name: 'view', defaultValue: 'na' }),
+                aurelia_framework_1.bindable({ name: 'width', defaultValue: '' }),
                 aurelia_framework_1.inject(FnTs_1.FnTs),
                 __metadata("design:paramtypes", [FnTs_1.FnTs])
             ], CpkModal);

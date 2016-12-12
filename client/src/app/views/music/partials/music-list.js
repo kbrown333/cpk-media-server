@@ -50,6 +50,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                     this.playlists = [];
                     this.loaded_playlist = [];
                     this.loaded_songs = [];
+                    this.selected_songs = [];
                     this.clickSubList = (name) => {
                         this.nav.list = name;
                         this.nav.index = 1;
@@ -66,6 +67,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             }
                             this.visibility[name].display = 'show';
                             this.view_header = this.visibility[name].header;
+                            this.clearSelectedSongs();
                         }
                     };
                     this.clickBack = () => {
@@ -164,6 +166,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             all_files: all_files
                         };
                         this.fn.ea.publish('react', { event_name: 'loadPlayerFromList', data: data });
+                        this.clearSelectedSongs();
                     };
                     this.clickAddPlaylist = () => {
                         this.fn.ea.publish('react', {
@@ -196,6 +199,26 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.nav.playlist = true;
                         this.toggleSubList('open_playlist');
                     };
+                    this.clickAddTrackToPlaylist = (track) => {
+                    };
+                    this.clickTrack = (data) => {
+                        var elem = $(data.elem.parentElement);
+                        var selected = elem.hasClass('selected_track');
+                        if (selected) {
+                            elem.removeClass('selected_track');
+                            this.selected_songs = this.selected_songs.filter((val) => {
+                                return val.path != data.data.path;
+                            });
+                        }
+                        else {
+                            elem.addClass('selected_track');
+                            this.selected_songs.push(data.data);
+                        }
+                    };
+                    this.clearSelectedSongs = () => {
+                        $("li").removeClass('selected_track');
+                        this.selected_songs = [];
+                    };
                     this.screenResize = (size = null) => {
                         this.resizeCategoryLists();
                     };
@@ -207,6 +230,7 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             height = Math.max(height, 150);
                             $('.category-list').css('max-height', height + "px");
                             $('.playlist-data').css('max-height', (height - 40) + "px");
+                            $('.song-list').css('max-height', (height - 40) + "px");
                         }, 50);
                     };
                     this.onModalClose = (data) => {

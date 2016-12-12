@@ -2,8 +2,6 @@
     <require from="../../../attributes/toggle-me"></require>
     <require from="../../../attributes/dbl-click"></require>
     <require from="../../../attributes/one-click"></require>
-    <require from="../../../elements/cpk-modal"></require>
-    <cpk-modal modal="add_playlist" view="./modal/add-playlist" width="width: 80%;"></cpk-modal>
 	<div class="list-view-header">
 		<div class="list-dir-buttons">
 			<i click.delegate="clickBack()" class="fa fa-arrow-left fa-2x" style="margin-top: 3px;"></i>
@@ -25,10 +23,21 @@
 		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.songs.display">
-		<ul class="category-list">
-			<li repeat.for="item of master_list" click.delegate="sendListToPlayer(item)">
-				<p>${item.title}</p>
-				<p>${item.artist}</p>
+		<ul class="category-list playlist-buttons">
+			<li class="playlist-header">
+				<div class="pull-right">
+					<i class="fa fa-times"></i>
+					<i class="fa fa-plus" click.delegate="clickAddTrackToPlaylist()"></i>
+				</div>
+			</li>
+		</ul>
+		<ul class="category-list song-list">
+			<li repeat.for="item of master_list">
+				<div class="group-container" dbl-click="event.bind: 'sendListToPlayer'; data.bind: item;"
+					one-click="event.bind: 'clickTrack'; data.bind: item; that: true">
+					<p>${item.title}</p>
+					<p>${item.artist}</p>
+				</div>
 			</li>
 		</ul>
 	</div>
@@ -73,7 +82,8 @@
 		</ul>
 		<ul class="category-list playlist-data">
 			<li repeat.for="item of playlists">
-				<div class="group-container" dbl-click="event.bind: 'selectPlaylist'; data.bind: $index;">
+				<div class="group-container" dbl-click="event.bind: 'selectPlaylist'; data.bind: $index;"
+					one-click="event.bind: 'clickTrack'; data.bind: item;">
 					<p>${item.name}</p>
 					<p>Count: ${item.tracks.length}</p>
 				</div>
@@ -91,7 +101,8 @@
 		</ul>
 		<ul class="category-list playlist-data">
 			<li repeat.for="item of loaded_playlist">
-				<div class="group-container" click.delegate="sendListToPlayer(item)">
+				<div class="group-container" dbl-click="event.bind: 'sendListToPlayer'; data.bind: item;"
+					one-click="event.bind: 'clickTrack'; data.bind: item; that: true">
 					<p>${item.title}</p>
 					<p>${item.artist}</p>
 				</div>
@@ -99,9 +110,18 @@
 		</ul>
 	</div>
 	<div class="list-view-panel" toggle-me.two-way="visibility.loaded_songs.display">
-		<ul class="category-list">
+		<ul class="category-list playlist-buttons">
+			<li class="playlist-header">
+				<div class="pull-right">
+					<i class="fa fa-times"></i>
+					<i class="fa fa-plus" click.delegate="clickAddTrackToPlaylist()"></i>
+				</div>
+			</li>
+		</ul>
+		<ul class="category-list song-list">
 			<li repeat.for="item of loaded_songs">
-				<div class="group-container" click.delegate="sendListToPlayer(item)">
+				<div class="group-container" dbl-click="event.bind: 'sendListToPlayer'; data.bind: item;"
+					one-click="event.bind: 'clickTrack'; data.bind: item; that: true">
 					<p>${item.title}</p>
 					<p>${item.artist}</p>
 				</div>

@@ -30,6 +30,7 @@ export class MusicList {
 	playlists: any = [];
 	loaded_playlist: any = [];
 	loaded_songs: any = [];
+	selected_songs: any = [];
 
 	constructor(private fn: FnTs, private session: SessionData) {
 		this.fn.fn_Ajax({ url: '/music/playlists' })
@@ -68,6 +69,7 @@ export class MusicList {
 			}
 			this.visibility[name].display = 'show';
 			this.view_header = this.visibility[name].header;
+			this.clearSelectedSongs();
 		}
 	}
 
@@ -171,6 +173,7 @@ export class MusicList {
 			all_files: all_files
 		};
 		this.fn.ea.publish('react', {event_name: 'loadPlayerFromList', data: data});
+		this.clearSelectedSongs();
 	}
 
 	clickAddPlaylist = () => {
@@ -207,6 +210,29 @@ export class MusicList {
 		this.toggleSubList('open_playlist');
 	}
 
+	clickAddTrackToPlaylist = (track: any) => {
+
+	}
+
+	clickTrack = (data: any) => {
+		var elem = $(data.elem.parentElement);
+		var selected = elem.hasClass('selected_track');
+		if (selected) {
+			elem.removeClass('selected_track');
+			this.selected_songs = this.selected_songs.filter((val) => {
+				return val.path != data.data.path;
+			});
+		} else {
+			elem.addClass('selected_track');
+			this.selected_songs.push(data.data);
+		}
+	}
+
+	clearSelectedSongs = () => {
+		$("li").removeClass('selected_track');
+		this.selected_songs = [];
+	}
+
 	//Event Aggregator Functions
 	screenResize = (size: any = null): void => {
 		this.resizeCategoryLists();
@@ -220,6 +246,7 @@ export class MusicList {
 			height = Math.max(height, 150);
 			$('.category-list').css('max-height', height + "px");
 			$('.playlist-data').css('max-height', (height - 40) + "px");
+			$('.song-list').css('max-height', (height - 40) + "px");
 		}, 50);
 	}
 

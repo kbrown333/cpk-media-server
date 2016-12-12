@@ -6,10 +6,15 @@ export class OneClickCustomAttribute {
 
     @bindable event: string;
     @bindable data: any;
+    @bindable that: boolean;
 
     constructor(private element: Element, private fn: FnTs) {
         $(element).click((event: JQueryEventObject) => {
-            this.fn.ea.publish('react', {event_name: this.event, data: this.data });
+            if (this.that) {
+                this.fn.ea.publish('react', {event_name: this.event, data: {data: this.data, elem: this.element} });
+            } else {
+                this.fn.ea.publish('react', {event_name: this.event, data: this.data });
+            }
         });
     }
 

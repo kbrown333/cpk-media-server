@@ -50,7 +50,10 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                     this.playlists = [];
                     this.loaded_playlist = [];
                     this.loaded_songs = [];
+                    this.selected_playlists = [];
                     this.selected_songs = [];
+                    this.show_delete_playlist = 'hide';
+                    this.show_delete_track = 'hide';
                     this.clickSubList = (name) => {
                         this.nav.list = name;
                         this.nav.index = 1;
@@ -200,6 +203,105 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                         this.toggleSubList('open_playlist');
                     };
                     this.clickAddTrackToPlaylist = (track) => {
+                        if (this.selected_songs.length > 0) {
+                            $("li", ".mdl-select-playlist").removeClass('mdl-playlist-selected');
+                            this.fn.ea.publish('react', {
+                                event_name: 'showModal',
+                                data: {
+                                    modal: 'select_playlist',
+                                    content: {
+                                        title: 'Add Track to Playlist',
+                                        playlists: this.playlists,
+                                        selected: null
+                                    }
+                                }
+                            });
+                        }
+                    };
+                    this.addTrackToPlaylist = (name) => {
+                        if (name != null && name.trim() != "") {
+                            var songs = this.selected_songs.map((val) => {
+                                return {
+                                    title: val.title,
+                                    year: val.year,
+                                    genre: val.genre,
+                                    path: val.path,
+                                    track: val.track,
+                                    artist: val.artist
+                                };
+                            });
+                            var req = {
+                                url: '/music/playlists/insert',
+                                type: 'POST',
+                                data: { info: JSON.stringify({ name: name, songs: songs }) }
+                            };
+                            this.fn.fn_Ajax(req)
+                                .then(this.updatePlaylistTracks)
+                                .catch((err) => { console.log(err); });
+                        }
+                    };
+                    this.updatePlaylistTracks = (data) => {
+                        var index = -1;
+                        this.playlists.filter((val, i) => {
+                            if (val.name == data.name) {
+                                index = i;
+                                return true;
+                            }
+                        });
+                        this.playlists[index].tracks = data.tracks;
+                        this.loaded_playlist = data.tracks;
+                        $("li").removeClass('selected_track');
+                    };
+                    this.clickDeleteTrackFromPlaylist = () => {
+                        if (this.selected_songs.length > 0) {
+                            var map = {};
+                            for (var i = 0; i < this.selected_songs.length; i++) {
+                                map[this.selected_songs[i].path] = true;
+                            }
+                            var name = this.visibility.open_playlist.header;
+                            var req = {
+                                url: '/music/playlists/remove',
+                                type: 'POST',
+                                data: { info: JSON.stringify({ map: map, name: name }) }
+                            };
+                            this.fn.fn_Ajax(req)
+                                .then(this.updatePlaylistTracks)
+                                .catch((err) => { console.log(err); });
+                        }
+                    };
+                    this.clickDeletePlaylist = () => {
+                        if (this.selected_playlists.length > 0) {
+                            var map = {};
+                            for (var i = 0; i < this.selected_playlists.length; i++) {
+                                map[this.selected_playlists[i].name] = true;
+                            }
+                            var req = {
+                                url: '/music/playlists/delete',
+                                type: 'POST',
+                                data: { info: JSON.stringify({ map: map }) }
+                            };
+                            this.fn.fn_Ajax(req)
+                                .then(this.updatePaylists)
+                                .catch((err) => { console.log(err); });
+                        }
+                    };
+                    this.updatePaylists = (data) => {
+                        this.playlists = data;
+                    };
+                    this.clickPlaylist = (data) => {
+                        var elem = $(data.elem.parentElement);
+                        var selected = elem.hasClass('selected_track');
+                        if (selected) {
+                            elem.removeClass('selected_track');
+                            this.selected_playlists = this.selected_playlists.filter((val) => {
+                                return val.name != data.data.name;
+                            });
+                        }
+                        else {
+                            elem.addClass('selected_track');
+                            this.selected_playlists.push(data.data);
+                        }
+                        this.toggleDeleteButtons();
                     };
                     this.clickTrack = (data) => {
                         var elem = $(data.elem.parentElement);
@@ -214,10 +316,26 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             elem.addClass('selected_track');
                             this.selected_songs.push(data.data);
                         }
+                        this.toggleDeleteButtons();
                     };
                     this.clearSelectedSongs = () => {
                         $("li").removeClass('selected_track');
                         this.selected_songs = [];
+                        this.toggleDeleteButtons();
+                    };
+                    this.toggleDeleteButtons = () => {
+                        if (this.selected_songs.length > 0) {
+                            this.show_delete_track = 'show';
+                        }
+                        else {
+                            this.show_delete_track = 'hide';
+                        }
+                        if (this.selected_playlists.length > 0) {
+                            this.show_delete_playlist = 'show';
+                        }
+                        else {
+                            this.show_delete_playlist = 'hide';
+                        }
                     };
                     this.screenResize = (size = null) => {
                         this.resizeCategoryLists();
@@ -238,10 +356,15 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             case 'add_playlist':
                                 this.addPlaylist(data.content.name);
                                 break;
+                            case 'select_playlist':
+                                this.addTrackToPlaylist(data.content.selected);
+                                break;
                         }
                     };
                     this.fn.fn_Ajax({ url: '/music/playlists' })
-                        .then((data) => { this.playlists = data; });
+                        .then((data) => {
+                        this.playlists = data;
+                    });
                 }
                 attached() {
                     this.app_events = this.fn.ea.subscribe('react', (event) => {

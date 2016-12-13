@@ -462,6 +462,29 @@ li.selected_track {
     background-color: black !important;
 }
 
+.mdl-select-playlist {
+    list-style-type: none;
+    max-height: 250px;
+    padding: 0px;
+    overflow-x: auto;
+}
+
+.mdl-select-playlist li {
+    font-size: 14px;
+    padding: 5px;
+    height: 30px;
+    background-color: #333030;
+    cursor: pointer;
+}
+
+.mdl-playlist-selected {
+    background-color: #cc0000 !important;
+}
+
+.mdl-select-playlist li:nth-of-type(odd) {
+    background-color: #474444;
+}
+
 @media(max-width: 991px) {
 
 }

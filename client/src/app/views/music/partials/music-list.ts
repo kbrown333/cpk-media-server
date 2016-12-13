@@ -30,11 +30,16 @@ export class MusicList {
 	playlists: any = [];
 	loaded_playlist: any = [];
 	loaded_songs: any = [];
+	selected_playlists: any = [];
 	selected_songs: any = [];
+	show_delete_playlist: string = 'hide';
+	show_delete_track: string = 'hide';
 
 	constructor(private fn: FnTs, private session: SessionData) {
 		this.fn.fn_Ajax({ url: '/music/playlists' })
-			.then((data) => { this.playlists = data; });
+			.then((data) => {
+				this.playlists = data;
+			});
 	}
 
 	attached() {
@@ -211,7 +216,110 @@ export class MusicList {
 	}
 
 	clickAddTrackToPlaylist = (track: any) => {
+		if (this.selected_songs.length > 0) {
+			$("li", ".mdl-select-playlist").removeClass('mdl-playlist-selected');
+			this.fn.ea.publish('react', {
+				event_name: 'showModal',
+				data: {
+					modal: 'select_playlist',
+					content: {
+						title: 'Add Track to Playlist',
+						playlists: this.playlists,
+						selected: null
+					}
+				}
+			});
+		}
+	}
 
+	addTrackToPlaylist = (name: any) => {
+		if (name != null && name.trim() != "") {
+			var songs = this.selected_songs.map((val) => {
+				return {
+					title: val.title,
+					year: val.year,
+					genre: val.genre,
+					path: val.path,
+					track: val.track,
+					artist: val.artist
+				}
+			});
+			var req = {
+				url: '/music/playlists/insert',
+				type: 'POST',
+				data: {info: JSON.stringify({name: name, songs: songs})}
+			}
+			this.fn.fn_Ajax(req)
+				.then(this.updatePlaylistTracks)
+				.catch((err) => { console.log(err); });
+		}
+	}
+
+	updatePlaylistTracks = (data: any) => {
+		var index = -1;
+		this.playlists.filter((val, i) => {
+			if (val.name == data.name) {
+				index = i;
+				return true;
+			}
+		});
+		this.playlists[index].tracks = data.tracks;
+		this.loaded_playlist = data.tracks;
+		$("li").removeClass('selected_track');
+	}
+
+	clickDeleteTrackFromPlaylist = () => {
+		if (this.selected_songs.length > 0) {
+			var map = {};
+			for (var i = 0; i < this.selected_songs.length; i++) {
+				map[this.selected_songs[i].path] = true;
+			}
+			var name = this.visibility.open_playlist.header;
+			var req = {
+				url: '/music/playlists/remove',
+				type: 'POST',
+				data: {info: JSON.stringify({map: map, name: name})}
+			}
+			this.fn.fn_Ajax(req)
+				.then(this.updatePlaylistTracks)
+				.catch((err) => { console.log(err); });
+		}
+	}
+
+	clickDeletePlaylist = () => {
+		if (this.selected_playlists.length > 0) {
+			var map = {};
+			for (var i = 0; i < this.selected_playlists.length; i++) {
+				map[this.selected_playlists[i].name] = true;
+			}
+			var req = {
+				url: '/music/playlists/delete',
+				type: 'POST',
+				data: {info: JSON.stringify({map: map})}
+			}
+			this.fn.fn_Ajax(req)
+				.then(this.updatePaylists)
+				.catch((err) => { console.log(err); });
+		}
+	}
+
+	updatePaylists = (data: any) => {
+		this.playlists = data;
+	}
+
+	clickPlaylist = (data: any) => {
+		var elem = $(data.elem.parentElement);
+		var selected = elem.hasClass('selected_track');
+		if (selected) {
+			elem.removeClass('selected_track');
+			this.selected_playlists = this.selected_playlists.filter((val) => {
+				return val.name != data.data.name;
+			});
+		} else {
+			elem.addClass('selected_track');
+			this.selected_playlists.push(data.data);
+		}
+		this.toggleDeleteButtons();
 	}
 
 	clickTrack = (data: any) => {
@@ -226,11 +334,26 @@ export class MusicList {
 			elem.addClass('selected_track');
 			this.selected_songs.push(data.data);
 		}
+		this.toggleDeleteButtons();
 	}
 
 	clearSelectedSongs = () => {
 		$("li").removeClass('selected_track');
 		this.selected_songs = [];
+		this.toggleDeleteButtons();
+	}
+
+	toggleDeleteButtons = () => {
+		if (this.selected_songs.length > 0) {
+			this.show_delete_track = 'show';
+		} else {
+			this.show_delete_track = 'hide';
+		}
+		if (this.selected_playlists.length > 0) {
+			this.show_delete_playlist = 'show';
+		} else {
+			this.show_delete_playlist = 'hide';
+		}
 	}
 
 	//Event Aggregator Functions
@@ -254,6 +377,9 @@ export class MusicList {
 		switch (data.modal) {
 			case 'add_playlist':
 				this.addPlaylist(data.content.name);
+				break;
+			case 'select_playlist':
+				this.addTrackToPlaylist(data.content.selected);
 				break;
 		}
 	}

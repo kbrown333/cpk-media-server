@@ -23,8 +23,9 @@
 # Custom Ignores #
 ##################
 config/*
-server/node_modules
+!server/node_modules
 server/node_modules/*
+!server/node_modules/jsmediatags
 client/node_modules
 client/node_modules/*
 client/src/jspm_packages

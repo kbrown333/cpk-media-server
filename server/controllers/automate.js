@@ -1,4 +1,5 @@
 module.exports.receive_message = function(job, done) {
+	console.log('receive_message');
 	try {
 		var ts = getTimeDifference(new Date(job.data.event_time));
 		if (ts > 1) {

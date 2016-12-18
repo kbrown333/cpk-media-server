@@ -34,3 +34,4 @@ server/keys
 server/keys/*
 server/db_music.json
 server/db_playlists.json
+server/db_config.json

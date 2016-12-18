@@ -104,6 +104,24 @@ var jsondb = require('node-json-db');
 global.jsdb = {};
 global.jsdb.music = new jsondb('db_music', true, false);
 global.jsdb.playlists = new jsondb('db_playlists', true, false);
+global.jsdb.config = new jsondb('db_config', true, false);
+try {
+    global.svr_config = jsdb.config.getData('/data');
+} catch (ex) {
+    global.jsdb.config.push('/data', {"devices":[]});
+    global.svr_config = {"devices":[]};
+}
+
+//REGISTER WITH REDIS MESSAGE QUEUE
+if (global.svr_config.redis_port != null && global.svr_config.redis != null) {
+    console.log('Starting automation features');
+    var Queue = require('bull');
+    var automate = require('./controllers/automate');
+    var redis_url = global.svr_config.redis;
+    var redis_port = global.svr_config.redis_port;
+    var receiveQueue = Queue("CPK Media Queue", redis_port, redis_url);
+    receiveQueue.process(automate.receive_message);
+}
 
 require('./controllers/song_map').get_data(function() {
     console.log('songs have been mapped');

@@ -119,7 +119,7 @@ if (global.svr_config.redis_port != null && global.svr_config.redis != null) {
     var automate = require('./controllers/automate');
     var redis_url = global.svr_config.redis;
     var redis_port = global.svr_config.redis_port;
-    var receiveQueue = Queue("CPK Media Queue", redis_port, redis_url);
+    var receiveQueue = Queue("Send Server", redis_port, redis_url);
     receiveQueue.process(automate.receive_message);
 }
 

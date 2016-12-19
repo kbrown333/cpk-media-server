@@ -1,5 +1,5 @@
 module.exports.receive_message = function(job, done) {
-	console.log('receive_message');
+	console.log('Message Received');
 	try {
 		var ts = getTimeDifference(new Date(job.data.event_time));
 		if (ts > 1) {
@@ -10,7 +10,8 @@ module.exports.receive_message = function(job, done) {
 				return val.name == job.data.device;
 			});
 			if (device.length > 0) {
-				console.dir(job.data);
+				console.log("Processing Message");
+				processAutoAction(job.data);
 				done();
 				removeJob(job);
 			} else {

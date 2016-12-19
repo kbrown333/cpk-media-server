@@ -114,6 +114,7 @@ try {
 
 //REGISTER WITH REDIS MESSAGE QUEUE
 if (global.svr_config.redis_port != null && global.svr_config.redis != null) {
+    //CREATE QUEUE
     console.log('Starting automation features');
     var Queue = require('bull');
     var automate = require('./controllers/automate');
@@ -121,6 +122,31 @@ if (global.svr_config.redis_port != null && global.svr_config.redis != null) {
     var redis_port = global.svr_config.redis_port;
     var receiveQueue = Queue("Send Server", redis_port, redis_url);
     receiveQueue.process(automate.receive_message);
+    global.processAutoAction = function(data) {
+        if (global.socket_listeners[data.device] != null) {
+            try {
+                global.socket_listeners[data.device].emit("auto_action", data);
+            } catch (ex) {
+                console.dir(ex);
+            }
+        }
+    }
+    global.socket_listeners = {};
+
+    //CREATE WEBSOCKET
+    var socketio = require('socket.io');
+    socketio.listen(server).on("connection", (socket) => {
+        console.log("received connection");
+        socket.on("register_device", (device_data) => {
+            var devices = global.svr_config.devices.filter((val) => {
+				return val.name == device_data.device;
+			});
+            if (devices.length > 0) {
+                console.log('device found');
+                global.socket_listeners[device_data.device] = socket;
+            }
+        });
+    });
 }
 
 require('./controllers/song_map').get_data(function() {

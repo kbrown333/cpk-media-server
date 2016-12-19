@@ -26,6 +26,7 @@
     <script type="text/javascript" id="config_script"></script>
     <script type="text/javascript" id="jqui_script"></script>
     <script type="text/javascript" id="wave_script"></script>
+    <script type="text/javascript" id="socket_io"></script>
     <div aurelia-app="main">
         <div class="splash">
             <div class="message">CPK Media Server</div>
@@ -45,6 +46,9 @@
                 });
                 $.getScript('app/javascript/wavesurfer.js', function(wave) {
                     $("#wave_script").text(wave);
+                });
+                $.getScript('socket.io/socket.io.js', function(data) {
+                    $("#socket_io").text(data);
                 });
             });
         </script>

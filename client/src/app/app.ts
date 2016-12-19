@@ -12,7 +12,7 @@ export class App {
     constructor(private router: Router, private session: SessionData, private fn: FnTs) {
         this.loadRouter();
         this.loadEventListener();
-        setTimeout(() => {this.loadAutoSocket();}, 5000);
+        this.loadAutoSocket();
         this.appLoaded();
     }
 
@@ -36,15 +36,20 @@ export class App {
     }
 
     loadAutoSocket() {
-        if (localStorage['device_name'] != null) {
-            var iosocket = io.connect();
-            iosocket.on("connect", () => {
-                iosocket.emit("register_device", {device: localStorage['device_name']});
-                iosocket.on("auto_action", (data: any) => {
-                    var test = data;
-                });
+        //defer loading so not to interfere with application load
+        setTimeout(() => {
+            //manually load script to compensate for raspbian / aurelia polyfill
+            $.getScript('socket.io/socket.io.js', (data) => {
+                $("#socket_io").text(data);
+                if (localStorage['device_name'] != null) {
+                    var iosocket = io.connect();
+                    iosocket.on("connect", () => {
+                        iosocket.emit("register_device", {device: localStorage['device_name']});
+                        iosocket.on("auto_action", this.automate);
+                    });
+                }
             });
-        }
+        }, 5000);
     }
 
     private appLoaded() {
@@ -76,5 +81,9 @@ export class App {
                 this.fn.ea.publish('react', {event_name: 'screenResize', data: data});
             }, 100);
         });
+    }
+
+    automate = (data: any) => {
+        this.fn.ea.publish('react', {event_name: 'receiveCommand', data: data})
     }
 }

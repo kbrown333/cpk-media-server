@@ -363,6 +363,22 @@ System.register(["aurelia-framework", "../../../models/FnTs", "../../../models/s
                             this.generateShuffle();
                         }
                     };
+                    this.receiveCommand = (data) => {
+                        switch (data.action) {
+                            case "play":
+                                this.play();
+                                break;
+                            case "pause":
+                                this.pause();
+                                break;
+                            case "next":
+                                this.nextSong();
+                                break;
+                            case "prev":
+                                this.prevSong();
+                                break;
+                        }
+                    };
                     this.track_time = {
                         total: "0:00",
                         current: "0:00"

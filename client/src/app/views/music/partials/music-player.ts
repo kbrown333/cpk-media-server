@@ -409,4 +409,21 @@ export class MusicPlayer {
 		}
 	}
 
+	receiveCommand = (data: any) => {
+		switch(data.action) {
+			case "play":
+				this.play();
+				break;
+			case "pause":
+				this.pause();
+				break;
+			case "next":
+				this.nextSong();
+				break;
+			case "prev":
+				this.prevSong();
+				break;
+		}
+	}
+
 }

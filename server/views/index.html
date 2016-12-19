@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Aurelia</title>
+    <title>CPK Media</title>
     <link rel="stylesheet" href="app/styles/aurelia-default.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
@@ -46,9 +46,6 @@
                 });
                 $.getScript('app/javascript/wavesurfer.js', function(wave) {
                     $("#wave_script").text(wave);
-                });
-                $.getScript('socket.io/socket.io.js', function(data) {
-                    $("#socket_io").text(data);
                 });
             });
         </script>

@@ -41,9 +41,12 @@ System.register(["aurelia-framework", "aurelia-router", "./models/session", "./m
                             this.session.visibility.aside = 'slide';
                         }, 10);
                     };
+                    this.automate = (data) => {
+                        this.fn.ea.publish('react', { event_name: 'receiveCommand', data: data });
+                    };
                     this.loadRouter();
                     this.loadEventListener();
-                    setTimeout(() => { this.loadAutoSocket(); }, 5000);
+                    this.loadAutoSocket();
                     this.appLoaded();
                 }
                 loadRouter() {
@@ -66,15 +69,18 @@ System.register(["aurelia-framework", "aurelia-router", "./models/session", "./m
                     });
                 }
                 loadAutoSocket() {
-                    if (localStorage['device_name'] != null) {
-                        var iosocket = io.connect();
-                        iosocket.on("connect", () => {
-                            iosocket.emit("register_device", { device: localStorage['device_name'] });
-                            iosocket.on("auto_action", (data) => {
-                                var test = data;
-                            });
+                    setTimeout(() => {
+                        $.getScript('socket.io/socket.io.js', (data) => {
+                            $("#socket_io").text(data);
+                            if (localStorage['device_name'] != null) {
+                                var iosocket = io.connect();
+                                iosocket.on("connect", () => {
+                                    iosocket.emit("register_device", { device: localStorage['device_name'] });
+                                    iosocket.on("auto_action", this.automate);
+                                });
+                            }
                         });
-                    }
+                    }, 5000);
                 }
                 appLoaded() {
                     this.handleResize();

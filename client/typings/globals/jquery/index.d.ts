@@ -3225,3 +3225,13 @@ interface WavesurferInterface {
     create(data: any): any;
 }
 declare var WaveSurfer: WavesurferInterface;
+
+declare var io : {
+    connect(): Socket;
+    connect(url: string): Socket;
+}
+interface Socket {
+    on(event: string, callback: Function);
+    on(event: string, callback: Function);
+    emit(event: string, data: any);
+}

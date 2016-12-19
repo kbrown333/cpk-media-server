@@ -12,6 +12,7 @@ export class App {
     constructor(private router: Router, private session: SessionData, private fn: FnTs) {
         this.loadRouter();
         this.loadEventListener();
+        setTimeout(() => {this.loadAutoSocket();}, 5000);
         this.appLoaded();
     }
 
@@ -32,6 +33,18 @@ export class App {
 		this.app_events = this.fn.ea.subscribe('react', (event: any) => {
             if (this[event.event_name] != null) { this[event.event_name](event.data); }
         });
+    }
+
+    loadAutoSocket() {
+        if (localStorage['device_name'] != null) {
+            var iosocket = io.connect();
+            iosocket.on("connect", () => {
+                iosocket.emit("register_device", {device: localStorage['device_name']});
+                iosocket.on("auto_action", (data: any) => {
+                    var test = data;
+                });
+            });
+        }
     }
 
     private appLoaded() {

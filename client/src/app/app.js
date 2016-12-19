@@ -43,6 +43,7 @@ System.register(["aurelia-framework", "aurelia-router", "./models/session", "./m
                     };
                     this.loadRouter();
                     this.loadEventListener();
+                    setTimeout(() => { this.loadAutoSocket(); }, 5000);
                     this.appLoaded();
                 }
                 loadRouter() {
@@ -63,6 +64,17 @@ System.register(["aurelia-framework", "aurelia-router", "./models/session", "./m
                             this[event.event_name](event.data);
                         }
                     });
+                }
+                loadAutoSocket() {
+                    if (localStorage['device_name'] != null) {
+                        var iosocket = io.connect();
+                        iosocket.on("connect", () => {
+                            iosocket.emit("register_device", { device: localStorage['device_name'] });
+                            iosocket.on("auto_action", (data) => {
+                                var test = data;
+                            });
+                        });
+                    }
                 }
                 appLoaded() {
                     this.handleResize();
